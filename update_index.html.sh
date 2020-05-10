@@ -1,4 +1,6 @@
 #!/bin/sh
+git add index.ipynb
+git commit -m "update index.ipynb"
 jupyter nbconvert --to slides index.ipynb
 git checkout gh-pages
 mv index.slides.html index.html
