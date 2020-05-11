@@ -52,7 +52,6 @@ fontconfig=2.13.0=h5d5b041_1
 freetype=2.9.1=hb4e5f40_0
 freexl=1.0.5=h1de35cc_0
 future=0.18.2=py38h32f6830_1
-gdal=2.3.3=py38hbe65578_0
 geopandas=0.6.1=py_0
 geos=3.7.1=h0a44026_0
 gettext=0.19.8.1=h15daf44_3
