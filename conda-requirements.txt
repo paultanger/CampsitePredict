@@ -125,7 +125,6 @@ llvm-openmp=10.0.0=h28b9765_0
 markupsafe=1.1.1=py38h1de35cc_0
 matplotlib=3.1.3=py38_0
 matplotlib-base=3.1.3=py38h9aa3819_0
-mkl-service=2.3.0=py38hfbe908c_0
 mkl_fft=1.0.15=py38h5e564d8_0
 mkl_random=1.1.0=py38h6440ff4_0
 monotonic=1.5=py_0
