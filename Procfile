@@ -1,0 +1,1 @@
+#web: bokeh serve — port=$PORT — allow-websocket-origin=flask_app.herokuapp.com — address=0.0.0.0 — use-xheaders flask_app.pyweb: gunicorn app:appheroku config:add BUILDPACK_URL=https://github.com/kennethreitz/conda-buildpack.git

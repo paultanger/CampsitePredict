@@ -2,3 +2,6 @@
 /refs/
 .idea/
 .ipynb_checkpoints/
+carto_API_cred.json
+.spyproject/
+__pycache__/
