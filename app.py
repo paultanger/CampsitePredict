@@ -17,7 +17,8 @@ from bokeh.embed import components
 app = Flask(__name__)
 
 # https://pjandir.github.io/Bokeh-Heroku-Tutorial/
-    
+# https://towardsdatascience.com/exploring-and-visualizing-chicago-transit-data-using-pandas-and-bokeh-part-ii-intro-to-bokeh-5dca6c5ced10
+
 # the main (so like index)
 @app.route('/')
 def index():
@@ -27,6 +28,8 @@ def index():
 @app.route('/home')
 def home():
     
+    USdata_filteredxy = pd.read_csv('USdata_filteredxy.csv')
+
     # Read the Shapefile into GeoDataFrame
     # Calculate the x and y coordinates of the geometries into separate columns
     # Convert the GeoDataFrame into a Bokeh DataSource
@@ -36,19 +39,25 @@ def home():
     # for testing
     #output_file("gmap.html")
     # also try satellite or road
-    map_options = GMapOptions(lat=30.2861, lng=-97.7394, map_type="hybrid", zoom=11)
+    # center over ridgway, CO
+    map_options = GMapOptions(lat=38.1584, lng=-107.7697, map_type="hybrid", zoom=5)
     
     p = gmap("AIzaSyB9IAkbG2YcspA3G1PfxWl5CcmLfSEyr9Q", map_options, \
              title="iOverlander data", tools=['hover', 'pan', 'wheel_zoom'], \
-                 toolbar_location="below")
+                 toolbar_location="below") 
+    # this doesn't work... 
+    # TODO: make wheel scroll zoom active by default
+    p.toolbar.active_scroll = p.select_one('wheel_zoom')
+    # source = ColumnDataSource(
+    #     data=dict(lat=[ 30.29,  30.20,  30.29],
+    #               lon=[-97.70, -97.74, -97.78])
+    #)
+    
+    # google maps uses regluar GPS not x y!
+    #p.circle(x= USdata_filteredxy['x'], y= USdata_filteredxy['y'], size=6, fill_color="blue", fill_alpha=0.8)
+    #p.circle(x= 3932604.694, y= -12929412.32, size=6, fill_color="blue", fill_alpha=0.8)
+    p.circle(x= USdata_filteredxy['Longitude'], y= USdata_filteredxy['Latitude'], size=6, fill_color="blue", fill_alpha=0.8)
 
-    source = ColumnDataSource(
-        data=dict(lat=[ 30.29,  30.20,  30.29],
-                  lon=[-97.70, -97.74, -97.78])
-    )
-    
-    p.circle(x="lon", y="lat", size=15, fill_color="blue", fill_alpha=0.8, source=source)
-    
     # for testing
     #show(p)
     
