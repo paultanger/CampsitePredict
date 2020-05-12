@@ -14,6 +14,7 @@ from bokeh.plotting import gmap
 from bokeh.models import BoxSelectTool
 from bokeh.embed import components
 import s3fs
+import boto3
 
 app = Flask(__name__)
 
@@ -45,8 +46,8 @@ def home():
     map_options = GMapOptions(lat=38.1584, lng=-107.7697, map_type="hybrid", zoom=5)
     
     # get API key
-    # fs = s3fs.S3FileSystem(anon=False)
-    # fs.ls('campsiteprediction')
+    fs = s3fs.S3FileSystem(anon=False)
+    fs.ls('campsiteprediction')
     # with fs.open('heroku_data/google_API_key', 'rb') as f:
     #     API_key = f.read().strip()
     
@@ -79,9 +80,9 @@ def home():
     #script, div = components(p)
 
     # basic test
-    #return render_template('home.html', title='home of maps')
+    return render_template('home.html', title='home of maps')
     
-    return render_template('home.html', script=script, div=div)
+    #return render_template('home.html', script=script, div=div)
 
 if __name__ == '__main__':
     # for testing
