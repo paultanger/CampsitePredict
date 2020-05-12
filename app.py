@@ -28,7 +28,7 @@ def index():
 @app.route('/home')
 def home():
     
-    USdata_filteredxy = pd.read_csv('USdata_filteredxy.csv')
+    #USdata_filteredxy = pd.read_csv('USdata_filteredxy.csv')
 
     # Read the Shapefile into GeoDataFrame
     # Calculate the x and y coordinates of the geometries into separate columns
@@ -60,7 +60,7 @@ def home():
     # google maps uses regluar GPS not x y!
     #p.circle(x= USdata_filteredxy['x'], y= USdata_filteredxy['y'], size=6, fill_color="blue", fill_alpha=0.8)
     #p.circle(x= 3932604.694, y= -12929412.32, size=6, fill_color="blue", fill_alpha=0.8)
-    p.circle(x= USdata_filteredxy['Longitude'], y= USdata_filteredxy['Latitude'], size=6, fill_color="blue", fill_alpha=0.8)
+    #p.circle(x= USdata_filteredxy['Longitude'], y= USdata_filteredxy['Latitude'], size=6, fill_color="blue", fill_alpha=0.8)
 
     # for testing
     #show(p)
