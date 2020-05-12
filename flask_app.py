@@ -12,14 +12,14 @@ from bokeh.embed import components
 from bokeh.models import HoverTool
 from bokeh.charts import Scatter
 
-import json
+#import json
 
 from bokeh.models import GeoJSONDataSource 
 from bokeh.plotting import figure, curdoc
 from bokeh.layouts import column
 
-import pandas as pd
-import geopandas as gpd
+#import pandas as pd
+#import geopandas as gpd
 
 
 app = Flask(__name__)
@@ -37,24 +37,24 @@ def home():
 # https://medium.com/@jodorning/how-to-deploy-a-bokeh-app-on-heroku-486d7db28299
 
 # Convert the GeoDataFrame to GeoJSON format so it can be read by Bokeh
-merged_json = json.loads(gdf.to_json())
-json_data = json.dumps(merged_json)
-geosource = GeoJSONDataSource(geojson=json_data)
+# merged_json = json.loads(gdf.to_json())
+# json_data = json.dumps(merged_json)
+# geosource = GeoJSONDataSource(geojson=json_data)
 
-# Make the plot
-TOOLTIPS = [
-('UN country', '@country')
-]
+# # Make the plot
+# TOOLTIPS = [
+# ('UN country', '@country')
+# ]
 
-p = figure(title='World Map', plot_height=600 , plot_width=950, tooltips=TOOLTIPS,
-x_axis_label='Longitude', y_axis_label='Latitude')
+# p = figure(title='World Map', plot_height=600 , plot_width=950, tooltips=TOOLTIPS,
+# x_axis_label='Longitude', y_axis_label='Latitude')
 
-p.patches('xs','ys', source=geosource, fill_color='white', line_color='black',
-hover_fill_color='lightblue', hover_line_color='black')
+# p.patches('xs','ys', source=geosource, fill_color='white', line_color='black',
+# hover_fill_color='lightblue', hover_line_color='black')
  
-# This final command is required to launch the plot in the browser
-curdoc().add_root(column(p))
+# # This final command is required to launch the plot in the browser
+# curdoc().add_root(column(p))
 
 if __name__ == "__main__":
-    #app.run(debug=True)
-    app.run(port=33507)
+    app.run(debug=True)
+    #app.run(port=33507)
