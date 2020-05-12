@@ -6,4 +6,4 @@ Jinja2==2.11.2
 pandas
 geopandas
 Shapely==1.7.0
-
+s3fs

@@ -13,7 +13,7 @@ from bokeh.models import ColumnDataSource, GMapOptions
 from bokeh.plotting import gmap
 from bokeh.models import BoxSelectTool
 from bokeh.embed import components
-#import s3fs
+import s3fs
 
 app = Flask(__name__)
 
@@ -62,7 +62,7 @@ def home():
     # google maps uses regluar GPS not x y!
     #p.circle(x= USdata_filteredxy['x'], y= USdata_filteredxy['y'], size=6, fill_color="blue", fill_alpha=0.8)
     #p.circle(x= 3932604.694, y= -12929412.32, size=6, fill_color="blue", fill_alpha=0.8)
-    #p.circle(x= USdata_filteredxy['Longitude'], y= USdata_filteredxy['Latitude'], size=6, fill_color="blue", fill_alpha=0.8)
+    p.circle(x= USdata_filteredxy['Longitude'], y= USdata_filteredxy['Latitude'], size=6, fill_color="blue", fill_alpha=0.8)
 
     # for testing
     #show(p)
