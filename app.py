@@ -46,14 +46,14 @@ def home():
     map_options = GMapOptions(lat=38.1584, lng=-107.7697, map_type="hybrid", zoom=5)
     
     # get API key
-    fs = s3fs.S3FileSystem(anon=False)
-    fs.ls('campsiteprediction')
+    # fs = s3fs.S3FileSystem(anon=False)
+    # fs.ls('campsiteprediction')
     # with fs.open('heroku_data/google_API_key', 'rb') as f:
     #     API_key = f.read().strip()
     
     s3 = boto3.resource('s3')
     obj = s3.Object('campsiteprediction', 'heroku_data/google_API_key')
-    obj.get()['Body'].read().decode('utf-8').strip()
+    API_key = obj.get()['Body'].read().decode('utf-8').strip()
     
     #API_key = pd.read('s3://campsiteprediction/heroku_data/google_API_key')
     
