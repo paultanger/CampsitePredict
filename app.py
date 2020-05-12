@@ -13,7 +13,7 @@ from bokeh.models import ColumnDataSource, GMapOptions
 from bokeh.plotting import gmap
 from bokeh.models import BoxSelectTool
 from bokeh.embed import components
-import s3fs
+#import s3fs
 
 app = Flask(__name__)
 
