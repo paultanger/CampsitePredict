@@ -48,3 +48,14 @@ USdata_filteredxy['x'], USdata_filteredxy['y'] = zip(*USdata_filteredxy.xy_coord
 
 # save data for app
 USdata_filteredxy.to_csv('data/USdata_filteredxy.csv')
+
+
+# convert to geopandas and maybe a shapefile
+import geopandas
+
+USsites_gdf = geopandas.GeoDataFrame(
+    USdata_filtered, geometry=geopandas.points_from_xy(USdata_filtered.Longitude, USdata_filtered.Latitude))
+
+# save to shapefile or geoJSON:
+USsites_gdf.to_file("countries.shp")
+USsites_gdf.to_file("countries.geojson", driver='GeoJSON')

@@ -14,3 +14,10 @@ elev = dem.sample(xy, 30).first().get('elevation').getInfo()
 print('Mount Everest elevation (m):', elev)
 
 # TODO using the lat long from ioverlander, get the sat tiles around them.
+
+# https://towardsdatascience.com/satellite-imagery-access-and-analysis-in-python-jupyter-notebooks-387971ece84b
+from sentinelsat import SentinelAPI
+
+user = 'detroitstylz' 
+password = 'mysentinallogin' 
+api = SentinelAPI(user, password, 'https://scihub.copernicus.eu/dhus')
