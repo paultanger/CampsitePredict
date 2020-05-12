@@ -10,7 +10,7 @@ from flask import Flask, render_template
 
 from bokeh.embed import components 
 from bokeh.models import HoverTool
-from bokeh.charts import Scatter
+#from bokeh.charts import Scatter
 
 #import json
 
