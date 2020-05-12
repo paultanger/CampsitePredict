@@ -42,12 +42,16 @@ def home():
     # center over ridgway, CO
     map_options = GMapOptions(lat=38.1584, lng=-107.7697, map_type="hybrid", zoom=5)
     
-    p = gmap("AIzaSyB9IAkbG2YcspA3G1PfxWl5CcmLfSEyr9Q", map_options, \
+    # get API key
+    with open('google_API_key') as f:
+        API_key = f.read().strip()
+    
+    p = gmap(API_key, map_options, \
              title="iOverlander data", tools=['hover', 'pan', 'wheel_zoom'], \
                  toolbar_location="below") 
     # this doesn't work... 
     # TODO: make wheel scroll zoom active by default
-    p.toolbar.active_scroll = p.select_one('wheel_zoom')
+    #p.toolbar.active_scroll = p.select_one('wheel_zoom')
     # source = ColumnDataSource(
     #     data=dict(lat=[ 30.29,  30.20,  30.29],
     #               lon=[-97.70, -97.74, -97.78])
