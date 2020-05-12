@@ -18,8 +18,9 @@ def home():
     #           x_axis_type='datetime')
     
     # script, div = components(plot)
-    #return render_template('home.html', title='home of maps')
-    return render_template('home.html', script=script, div=div)
+    return render_template('home.html', title='home of maps')
+    #return render_template('home.html', script=script, div=div)
 
 if __name__ == '__main__':
-    app.run(debug=True, use_reloader=True)
+    #app.run(debug=True, use_reloader=True)
+    app.run(port=33507)
