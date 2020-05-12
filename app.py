@@ -13,6 +13,7 @@ from bokeh.models import ColumnDataSource, GMapOptions
 from bokeh.plotting import gmap
 from bokeh.models import BoxSelectTool
 from bokeh.embed import components
+import s3fs
 
 app = Flask(__name__)
 
@@ -29,6 +30,7 @@ def index():
 def home():
     
     #USdata_filteredxy = pd.read_csv('USdata_filteredxy.csv')
+    USdata_filteredxy = pd.read_csv('s3://campsiteprediction/heroku_data/USdata_filteredxy.csv')
 
     # Read the Shapefile into GeoDataFrame
     # Calculate the x and y coordinates of the geometries into separate columns
