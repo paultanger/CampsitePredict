@@ -45,16 +45,16 @@ def home():
     map_options = GMapOptions(lat=38.1584, lng=-107.7697, map_type="hybrid", zoom=5)
     
     # get API key
-    fs = s3fs.S3FileSystem(anon=False)
-    fs.ls('campsiteprediction')
-    with fs.open('heroku_data/google_API_key', 'rb') as f:
-        API_key = f.read().strip()
+    # fs = s3fs.S3FileSystem(anon=False)
+    # fs.ls('campsiteprediction')
+    # with fs.open('heroku_data/google_API_key', 'rb') as f:
+    #     API_key = f.read().strip()
     
     #API_key = pd.read('s3://campsiteprediction/heroku_data/google_API_key')
     
-    p = gmap(API_key, map_options, \
-             title="iOverlander data", tools=['hover', 'pan', 'wheel_zoom'], \
-                 toolbar_location="below") 
+    # p = gmap(API_key, map_options, \
+    #          title="iOverlander data", tools=['hover', 'pan', 'wheel_zoom'], \
+    #              toolbar_location="below") 
     # this doesn't work... 
     # TODO: make wheel scroll zoom active by default
     #p.toolbar.active_scroll = p.select_one('wheel_zoom')
@@ -66,7 +66,7 @@ def home():
     # google maps uses regluar GPS not x y!
     #p.circle(x= USdata_filteredxy['x'], y= USdata_filteredxy['y'], size=6, fill_color="blue", fill_alpha=0.8)
     #p.circle(x= 3932604.694, y= -12929412.32, size=6, fill_color="blue", fill_alpha=0.8)
-    p.circle(x= USdata_filteredxy['Longitude'], y= USdata_filteredxy['Latitude'], size=6, fill_color="blue", fill_alpha=0.8)
+    #p.circle(x= USdata_filteredxy['Longitude'], y= USdata_filteredxy['Latitude'], size=6, fill_color="blue", fill_alpha=0.8)
 
     # for testing
     #show(p)
@@ -76,7 +76,7 @@ def home():
     
     # these will be pasted into html
     
-    script, div = components(p)
+    #script, div = components(p)
 
     # basic test
     #return render_template('home.html', title='home of maps')
