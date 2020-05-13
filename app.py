@@ -92,6 +92,11 @@ def home():
     
     return render_template('home.html', script=script, div=div)
 
+# @app.errorhandler(404)
+# def page_not_found(error):
+#     """Custom 404 page."""
+#     return render_template('404.html'), 404
+
 if __name__ == '__main__':
     # for testing
     #app.run(debug=True, use_reloader=True)
