@@ -1,4 +1,24 @@
-<html>
+
+{% extends "layout.html" %}
+{% block content %}
+
+    <link rel="stylesheet" href="//cdn.pydata.org/bokeh/release/bokeh-2.0.2.min.css" type="text/css" />
+    <script type="text/javascript" src="//cdn.pydata.org/bokeh/release/bokeh-2.0.2.min.js"></script>
+    
+    
+   <div class="home">
+      <h1>This currently maps ioverlander sites in the US.  Later on, it will include predicted sites</h1>
+      
+      {{ div|safe }}
+      {{ script|safe }}
+      
+    </div>
+ {% endblock %}
+ 
+
+ 
+ <!--
+ <html>
   <head>
     <!-- <link rel="stylesheet" href='{ url_for('static', filename='style.css')}' type="text/css" /> -->
     <link rel="stylesheet" href="//cdn.pydata.org/bokeh/release/bokeh-2.0.2.min.css" type="text/css" />
@@ -16,4 +36,6 @@
     </div>
   </body>
 </html>
+
+ -->
 

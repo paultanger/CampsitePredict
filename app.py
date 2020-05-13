@@ -58,8 +58,11 @@ def home():
     #API_key = pd.read('s3://campsiteprediction/heroku_data/google_API_key')
     
     p = gmap(API_key, map_options, \
-              title="iOverlander data", tools=['hover', 'pan', 'wheel_zoom'], \
+              tools=['hover', 'pan', 'wheel_zoom'], \
                   toolbar_location="below") 
+        
+    p.plot_height=600
+    p.plot_width=1000
     # this doesn't work... 
     # TODO: make wheel scroll zoom active by default
     #p.toolbar.active_scroll = p.select_one('wheel_zoom')
