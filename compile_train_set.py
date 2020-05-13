@@ -35,7 +35,7 @@ def merc(coords):
 # USdata_filtered.at[0,'Latitude']
 
 # TODO: clean up and optimize this part
-x, y = merc(USdata_filtered.at[0,'Latitude'], USdata_filtered.at[0,'Longitude'])
+#x, y = merc(USdata_filtered.at[0,'Latitude'], USdata_filtered.at[0,'Longitude'])
 
 USdata_filtered['coords'] = list(zip(USdata_filtered.Latitude, USdata_filtered.Longitude))
 
@@ -57,5 +57,19 @@ USsites_gdf = geopandas.GeoDataFrame(
     USdata_filtered, geometry=geopandas.points_from_xy(USdata_filtered.Longitude, USdata_filtered.Latitude))
 
 # save to shapefile or geoJSON:
-USsites_gdf.to_file("countries.shp")
+USsites_gdf.to_file("USdata_filteredxy.shp")
 USsites_gdf.to_file("countries.geojson", driver='GeoJSON')
+
+# subset just a couple for testing:
+USsites3_test = USsites_gdf.head(3)
+
+USsites3_test = USdata_filtered.drop(['coords'], axis=1)
+
+USsites3_test_gdf = geopandas.GeoDataFrame(
+    USsites3_test, geometry=geopandas.points_from_xy(USsites3_test.Longitude, USsites3_test.Latitude))
+
+# set wd
+wd = 'data/test_shp/'
+USsites3_test_gdf.to_file(wd + "USsites3_test.shp")
+
+
