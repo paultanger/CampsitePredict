@@ -52,6 +52,13 @@ more layers with increasing numbers of filters
 more epochs 100
 .8484 !!!
 
+200 epochs
+.8672
+
+shuffle 200
+
+200 epochs with more filters in each layer..
+
 try sobel transformation
 
 would need to reload dataset to run:
@@ -63,3 +70,5 @@ greyscale
 
 clean data by eliminating images with a low pixel range?
 diff zoom level?
+
+Why were you working with this data set? What questions did you have at the beginning of the week? How did you go about working with your data? What tools, specifically, did you utilize and why? What were your findings? What problems did you face? How did you overcome them? What questions do you have now that you didn't have at the beginning of the week, pertaining to this data? OR What features/future implementations would improve your findings?
