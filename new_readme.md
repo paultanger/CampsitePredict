@@ -7,20 +7,59 @@ fixed shuffle parameter
 increase batch size and nb filters from 32 to 40
 .68
 batch size 100, add dropout 0.3, filters to 32
+oops predictions are uniform..
 
 just do these categories:
 Established Campground
-Informal Campsite
 Wild Camping
+16232 files
+0.7344
+
+20 epochs on colab
+.80 but overfit train data (.99)
+
+add dropout .3
+.825
+
+dropout 0.5
+.83
+
+filters from 32 to 16
+.82
+
+filters to 64
+.8287
+
+try diff kernel and pool size
+kernel from 3 to 4,4
+.81
+
+kernal to 2,2
+.837
+
+try diff optimizer sgd (.66 stuck in local min? need more epochs?) adadelta
 
 add more layers?
-add established campground info?
-Add dropouts?
-Validation size
-image size
-greyscale
+this actually reduces trainable parameters.. tried with filters 64
+.81
+
 more augmentation
-tweak other parameters
+.76
+
+more layers with increasing numbers of filters
+.78
+
+more epochs 100
+.8484 !!!
+
+try sobel transformation
+
+would need to reload dataset to run:
+try bigger image size full 400
+Validation size
+
+# maybe later:
+greyscale
+
 clean data by eliminating images with a low pixel range?
 diff zoom level?
-drop classes without much data?
