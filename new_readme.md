@@ -58,6 +58,7 @@ more epochs 100
 shuffle 200
 
 200 epochs with more filters in each layer..
+.861
 
 try sobel transformation
 
