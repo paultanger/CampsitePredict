@@ -2,10 +2,8 @@
 /refs/
 .idea/
 .ipynb_checkpoints/
-carto_API_cred.json
 .spyproject/
-google_API_key
-aws_config.ini
+/presentation/project_talk.pptx
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
