@@ -35,7 +35,7 @@ test.start()
 
 # https://towardsdatascience.com/satellite-imagery-access-and-analysis-in-python-jupyter-notebooks-387971ece84b
 from sentinelsat import SentinelAPI
-
+import getpass
 user = 'detroitstylz' 
-password = 'mysentinallogin' 
+password = getpass.getpass()
 api = SentinelAPI(user, password, 'https://scihub.copernicus.eu/dhus')
