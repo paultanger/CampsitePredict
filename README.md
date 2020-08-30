@@ -33,15 +33,15 @@ available from the ioverlander mobile app to train and validate predictions.
 
 ## How to use
 
-This project uses jupyter notebooks for the most part, with support functions in src/helper_funcs.py.
+This project uses jupyter notebooks for the most part, with support functions in `src/helper_funcs.py`.
 1. For now, the data has not been uploaded and shared but you can fetch it yourself from iOverlander and get images
-using google Static Maps API with these notebooks (located in the notebooks directory): get_states_zips.ipynb and get_images.ipynb.
-2. The training and validation data was examined in summarize_data.ipynb
-3. The established campground data was examined and obtained in established_campgrounds.ipynb
-4. The data and models were compiled and developed in preprocess_and_build_model-binary.ipynb and run on google colab with run_sat_models_colab.ipynb
-5. The test data (from states the model had not seen before) was examined in summarize_test_data.ipynb to check class balances.
-6. You can use test_model_new_data.ipynb notebook to load a saved model and test with new data and plot ROC, confusion matrix, example images, and examples of images where the model did not produce the correct classification.
-7. The NLP analysis was completed in NLP_of_descriptions.ipynb.
+using google Static Maps API with these notebooks (located in the notebooks directory): `get_states_zips.ipynb` and `get_images.ipynb`.
+2. The training and validation data was examined in `summarize_data.ipynb`
+3. The established campground data was examined and obtained in `established_campgrounds.ipynb`
+4. The data and models were compiled and developed in `preprocess_and_build_model-binary.ipynb` and run on google colab with `run_sat_models_colab.ipynb`
+5. The test data (from states the model had not seen before) was examined in `summarize_test_data.ipynb` to check class balances.
+6. You can use `test_model_new_data.ipynb` notebook to load a saved model and test with new data and plot ROC, confusion matrix, example images, and examples of images where the model did not produce the correct classification.
+7. The NLP analysis was completed in `NLP_of_descriptions.ipynb`.
 
 ## Background
 
