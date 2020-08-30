@@ -20,8 +20,9 @@ def nice_filename(fname, extension):
 
 def get_state_zip(df):
     '''
-    gets zip code and state and return as separate lists
+    gets zip code and state and return as two separate lists (zips, states)
     '''
+    # TODO: add verbosity options
     zips = []
     states = []
     
@@ -156,6 +157,7 @@ def download_images(client, df, zoomlevel, max_requests=10, prefix="", out_path=
 
 def run_model(model, X_test):
     '''
+    requires numpy as np and sklearn metrics
     gets model predictions from keras model
     returns: y, predictions, y_pred, y_pred_bin, fpr_keras, tpr_keras, thresholds_keras, auc_keras
     '''
@@ -169,7 +171,8 @@ def run_model(model, X_test):
 
 def compute_confusion_matrix(y_true_class, y_pred_class):
     '''
-    computes confusion matrix
+    computes confusion matrix and returns as array
+    requires sklearn confusion_matrix
     '''
     confmat = confusion_matrix(y_true_class, y_pred_class, labels=range(2))
     confmat = confmat / confmat.sum(0).astype(float)
@@ -178,8 +181,9 @@ def compute_confusion_matrix(y_true_class, y_pred_class):
 def plot_conf_matrix(confmat, ax, x_labels, y_labels, title):
     '''
     return ax with confusion matrix plot
+    requires pandas as pd and seaborn as sns and matplotlib.pyplot as plt
     '''
-    df_cm = pd.DataFrame(confmat, index = ['Predict: Established', 'Predict: Wild'], columns = ['Actual: Established', 'Actual: Wild'])
+    df_cm = pd.DataFrame(confmat, index = x_labels, columns = y_labels)
     sns.heatmap(df_cm, annot=True, fmt=".2f", cmap="Blues")
     plt.yticks(va="center")
     plt.title(title)
@@ -188,6 +192,7 @@ def plot_conf_matrix(confmat, ax, x_labels, y_labels, title):
 def get_ROC_plot(ax, fpr_keras, tpr_keras, auc_keras, title):
     '''
     return ax with ROC plot
+    requires matplotlib.pyplot as plt
     '''
     ax.plot(fpr_keras, tpr_keras, label='model (area = {:.3f})'.format(auc_keras))
     ax.plot([0, 1], [0, 1], linestyle='--', lw=2, color='r', label='Chance', alpha=.8)
@@ -199,7 +204,7 @@ def get_ROC_plot(ax, fpr_keras, tpr_keras, auc_keras, title):
 
 def get_imgs_into_df(X_test, y, predictions_binary_vec):
     '''
-    accepts tf dataset and predictions and binary predictions
+    accepts tf dataset and y true and binary predictions
     returns a df with predictions, actual, and images in cols
     '''
     # get images into df
@@ -218,7 +223,7 @@ def get_imgs_into_df(X_test, y, predictions_binary_vec):
 def plot_wrong_imgs(wrong_imgs, figsize=(15,15), num_samples=20):
     '''
     accepts a df of images (as numpy arrays) with the following cols:
-    predict, actual image (such as obtained from get_imgs_into_df())
+    predict, actual, image (such as obtained from get_imgs_into_df())
     plots a grid with the predictions and actual images
     returns fig, axs
     '''
@@ -293,18 +298,12 @@ def plot_train_val_acc(history, epochs, ax):
     ax.set_title('Training and Validation Loss')
     return ax
 
-def get_cat_summary(cat_dict, cluster_feats, cluster_names):
-    cat_df = pd.concat({k: pd.DataFrame.from_dict(v, 'index') for k, v in cat_dict.items()}, axis=0).reset_index()
-    cat_df.columns = ['cluster', 'category', 'count']
-    cat_df['cluster'] = cat_df['cluster'].astype('str')
-    cat_df['pct_total'] = round(cat_df['count'].div(cat_df.groupby('cluster')['count'].transform('sum'))*100, 2)
-    max_indices = cat_df.groupby(['cluster'])['pct_total'].transform(max) == cat_df['pct_total']
-    cat_max = cat_df[max_indices].copy()
-    cat_max['top words'] = pd.Series(cluster_feats).values
-    cat_max['cluster name'] = cluster_names 
-    return cat_max, cat_df
-
 def run_kmeans(X, df, features, k):
+    '''
+    accepts a TFIDF object (X), original df, features, and k (int)
+    runs k means, gets top 20 cluster features, calcs % most common in each
+    returns these as two dictionaries
+    '''
     kmeans = KMeans(k)
     kmeans.fit(X)
     top_centroids = kmeans.cluster_centers_.argsort()[:,-1:-21:-1]
@@ -325,3 +324,19 @@ def run_kmeans(X, df, features, k):
         for j in range (len(most_common)):
             cluster_cats[i].update({most_common[j][0] : most_common[j][1]})
     return cluster_cats, cluster_feats
+
+def get_cat_summary(cat_dict, cluster_feats, cluster_names=[]):
+    '''
+    accepts cat_dict, cluster_feats as obtained from run_kmeans()
+    cluster_names is your guess as to the names of these
+    returns category df and the max of each category
+    '''
+    cat_df = pd.concat({k: pd.DataFrame.from_dict(v, 'index') for k, v in cat_dict.items()}, axis=0).reset_index()
+    cat_df.columns = ['cluster', 'category', 'count']
+    cat_df['cluster'] = cat_df['cluster'].astype('str')
+    cat_df['pct_total'] = round(cat_df['count'].div(cat_df.groupby('cluster')['count'].transform('sum'))*100, 2)
+    max_indices = cat_df.groupby(['cluster'])['pct_total'].transform(max) == cat_df['pct_total']
+    cat_max = cat_df[max_indices].copy()
+    cat_max['top words'] = pd.Series(cluster_feats).values
+    cat_max['cluster name'] = cluster_names 
+    return cat_max, cat_df
