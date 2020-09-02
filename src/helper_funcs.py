@@ -10,6 +10,8 @@ import seaborn as sns
 from sklearn import metrics
 from sklearn.metrics import classification_report, confusion_matrix
 from random import choices
+from sklearn.cluster import KMeans
+from collections import Counter
 
 def nice_filename(fname, extension):
     '''
