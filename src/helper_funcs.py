@@ -80,7 +80,7 @@ def get_state_zip(df, gmaps):
         return zips, states
 
 
-def download_images(client, df, zoomlevel, max_requests=10, prefix="", out_path="../data/"):
+def download_images(client, df, zoomlevel, n_requests, max_requests=10, prefix="", out_path="../data/"):
     '''
     downloads satellite images using a google API, a df with a Latitude and Longitude column and a Category column
     You can specify zoom level, and where to save the images.
@@ -93,7 +93,7 @@ def download_images(client, df, zoomlevel, max_requests=10, prefix="", out_path=
     if not os.path.exists(out_path):
         os.makedirs(out_path)
 
-    global n_requests
+    # global n_requests
 
     for i, site in df.iterrows():
         print(f'Pulling image {i}, total API requests so far = {n_requests}')
