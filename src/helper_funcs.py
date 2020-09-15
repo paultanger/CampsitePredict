@@ -25,7 +25,7 @@ def nice_filename(fname, extension):
     return fname + '_' + datetime.now().strftime(FORMAT) + '.' + extension
 
 
-def get_state_zip(df, gmaps):
+def get_state_zip(df, gmaps, n_requests):
     '''
     gets zip code and state and return as two separate lists (zips, states)
     '''
@@ -33,7 +33,7 @@ def get_state_zip(df, gmaps):
     zips = []
     states = []
 
-    global n_requests
+    # global n_requests
 
     for i, site in df.iterrows():
         result = None
@@ -76,8 +76,7 @@ def get_state_zip(df, gmaps):
         wait_time = random.randint(1, 3)
         print(f'waiting for: {wait_time} seconds')
         time.sleep(wait_time)  # in seconds
-
-        return zips, states
+    return zips, states
 
 
 def download_images(client, df, zoomlevel, n_requests, max_requests=10, prefix="", out_path="../data/"):
