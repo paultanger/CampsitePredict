@@ -15,6 +15,10 @@ from sklearn.metrics import classification_report, confusion_matrix
 from random import choices
 from sklearn.cluster import KMeans
 from collections import Counter
+import sys
+from skimage import io
+import shutil
+from skimage.filters import sobel
 
 
 def nice_filename(fname, extension):
@@ -359,3 +363,141 @@ def get_cat_summary(cat_dict, cluster_feats, cluster_names=[]):
     cat_max['top words'] = pd.Series(cluster_feats).values
     cat_max['cluster name'] = cluster_names
     return cat_max, cat_df
+
+def check_imgs(directory, exclude_dir, sobel_dir):
+    counter = 0
+    sb_count = 0
+    filedict = {}
+    # make list of files with name and path in dict
+    for root_path, dirs, files in os.walk(directory, followlinks=False):
+        for file in files:
+            if file.endswith(".png"):
+                filedict[file] = str(os.path.join(root_path, file))
+    # now go through files
+    for file, filepath in filedict.items():
+                image = io.imread(filepath)
+                pixel_range = []
+                for channel in range(3):
+                    pixel_range.append(image[:,:,channel].std())
+                # if all channels have a small range, exclude file
+                if np.all(np.array(pixel_range) < 10):
+                    print(f'excluding: {file}')
+                    print(os.path.join(exclude_dir + os.sep + file))
+                    # move file
+                    shutil.move(filepath, os.path.join(exclude_dir + os.sep + file)) #, symlinks=False)
+                    # os.rename(filepath, os.path.join(exclude_dir + os.sep + file))  
+                    counter += 1
+# #                 else:
+# #                     continue
+# #     #                 image_sb = sobel_image(image).astype('uint8')
+# #     #                 sb_filename = os.path.join(sobel_dir, file)
+# #     #                 io.imsave(sb_filename, image_sb, check_contrast=False)
+# #     #                 sb_count += 1
+    print(f'{counter} files were excluded and moved.')
+    print(f'{sb_count} files were saved as sobeled.')
+    return filedict
+
+
+def sobel_image(image):
+    '''
+    get img gradients for image
+    '''
+    ### drop alpha
+    image = image[:,:,:3]
+    # get gradients
+#     sobel_mag = np.sqrt(sum([sobel(image, axis=i)**2 for i in range(image.ndim)]) / image.ndim)
+#     sobel_mag *= 255.0 / np.max(sobel_mag)  # normalize (Q&D)
+    
+    #### with things spelled out
+    dx = sobel(image, axis=0)  # horizontal derivative
+    dy = sobel(image, axis=1)  # vertical derivative
+    mag = np.hypot(dx, dy)  # magnitude
+    mag *= 255.0 / np.max(mag) # normalize
+#     mag *= 10.0 / np.max(mag) # tone it down
+    sobel_mag = mag
+    # put alpha back as 255
+    alpha = np.ones((test.shape[0], test.shape[1]))*255
+    rgba = np.dstack( (sobel_mag, alpha) )
+    return rgba
+
+
+def sobel_imgs(directory, sobel_dir):
+    sb_count = 0
+    filedict = {}
+    dirlist = []
+    # make list of files with name and path in dict
+    for root_path, dirs, files in os.walk(directory, followlinks=False):
+        for dir_ in dirs:
+            dirlist.append(dir_)
+        for file in files:
+            if file.endswith(".png"):
+                filedict[file] = str(os.path.join(root_path, file))
+    # now go through files
+    for file, filepath in filedict.items():
+        image = io.imread(filepath)
+        image_sb = sobel_image(image).astype('uint8')
+        # each channel separately
+#         fig, axs = plt.subplots(1, 4, figsize=(20,8))
+#         axs[0].imshow(image_sb[:,:,0], cmap='Greys')
+#         axs[1].imshow(image_sb[:,:,1], cmap='Greys')
+#         axs[2].imshow(image_sb[:,:,2], cmap='Greys')
+#         axs[3].imshow(image)
+#         plt.show()
+        # create subdir path for each file
+        parent = os.path.basename(os.path.dirname(os.path.dirname(filepath)))
+        subdir = os.path.basename(os.path.dirname(filepath))
+        fullparent = os.path.join(sobel_dir + os.sep + parent + os.sep + subdir)
+        sb_filename = os.path.join(fullparent + os.sep + file)
+        # need to be able to create dir if doesn't exist to keep files in cat dirs
+        if not os.path.isdir(fullparent):
+            os.makedirs(fullparent)
+        # save file
+        io.imsave(sb_filename, image_sb, check_contrast=False)
+        sb_count += 1
+        
+    print(f'{sb_count} files were saved as sobeled.')
+    return filedict, dirlist
+
+def make_symlinks(directory, destination, dest_dir_name, class_dirs):
+    counter = 0
+    filedict = {}
+    # make list of files with name and path in dict
+    for root_path, dirs, files in os.walk(directory, followlinks=False):
+        for file in files:
+            if file.endswith(".png"):
+                filedict[file] = str(os.path.join(root_path, file))
+    # create symlink dir
+    symlink_dir_path = os.path.join(destination + dest_dir_name)
+#     print(symlink_dir_path)
+    if not os.path.isdir(symlink_dir_path):
+            os.makedirs(symlink_dir_path)
+    # now go through files
+    for file, filepath in filedict.items():
+        # setup class directory name to check if it is a category we want to copy
+#         parent = os.path.basename(os.path.dirname(os.path.dirname(filepath)))
+#         print(parent)
+        subdir = os.path.basename(os.path.dirname(filepath))
+#         print(subdir)
+#         fullparent = os.path.join(sobel_dir + os.sep + parent + os.sep + subdir)
+        
+        # only copy files if in directories we want
+        if subdir in class_dirs:
+#             print(subdir)
+            # create symlink
+#             print(filepath)
+            destination_filepath = os.path.join(destination + dest_dir_name + os.sep + subdir + os.sep + file)
+#             print(destination_filepath)
+            # create class dir if it doesn't exist
+            destination_class_dir = os.path.join(destination + dest_dir_name + os.sep + subdir + os.sep)
+#             print(destination_class_dir)
+            if not os.path.isdir(destination_class_dir):
+                os.makedirs(destination_class_dir)
+            # create destination filepath
+            os.symlink(filepath, destination_filepath, target_is_directory=False)
+            # ln -s ~/source/* wild_est_after_exc/Established\ Campground/
+            counter += 1
+    print(f'{counter} files were created as symlinks.')
+    return filedict
+
+if __name__ == "__main__":
+    pass
