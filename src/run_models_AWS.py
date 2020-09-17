@@ -78,6 +78,7 @@ def build_model(model_dir=None):
 
 if __name__ == "__main__":
     # aws s3 cp s3://my_bucket/my_folder/my_file.ext my_copied_file.ext
+    # aws s3 cp s3://campsite-data/data data --recursive
     os.system('source activate tensorflow2_latest_p37')
     print(keras.__version__)
     print(tensorflow.__version__)
