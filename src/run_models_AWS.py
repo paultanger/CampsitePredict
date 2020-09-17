@@ -2,13 +2,13 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-import keras
 import tensorflow
+from tensorflow import keras
 
 import os
 
 from tensorflow import TensorSpec, float32, int32
-from tensorflow import keras, data
+from tensorflow import data
 from tensorflow.keras import layers
 from tensorflow.keras.models import Sequential
 from tensorflow.data.experimental import load
@@ -79,7 +79,7 @@ def build_model(model_dir=None):
 if __name__ == "__main__":
     # aws s3 cp s3://my_bucket/my_folder/my_file.ext my_copied_file.ext
     # aws s3 cp s3://campsite-data/data data --recursive
-    os.system('source activate tensorflow2_latest_p37')
+    # os.system('source activate tensorflow2_latest_p37')
     print(keras.__version__)
     print(tensorflow.__version__)
     os.system('nvidia-smi')
