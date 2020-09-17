@@ -19,7 +19,7 @@ import sys
 from skimage import io
 import shutil
 from skimage.filters import sobel
-
+import re
 
 def nice_filename(fname, extension):
     '''
@@ -498,6 +498,51 @@ def make_symlinks(directory, destination, dest_dir_name, class_dirs):
             counter += 1
     print(f'{counter} files were created as symlinks.')
     return filedict
+
+def make_symlinks_only_unaugmented(directory, destination, dest_dir_name, class_dirs):
+    counter = 0
+    filedict = {}
+    # make list of files with name and path in dict
+    for root_path, dirs, files in os.walk(directory, followlinks=False):
+        for file in files:
+            if file.endswith(".png"):
+                # only keep original files not augmented
+                if not re.search('rot[0-9]{2,3}.png$', file):
+#                     print(file)
+                    filedict[file] = str(os.path.join(root_path, file))
+#     # create symlink dir
+    symlink_dir_path = os.path.join(destination + dest_dir_name)
+#     print(symlink_dir_path)
+    if not os.path.isdir(symlink_dir_path):
+            os.makedirs(symlink_dir_path)
+    # now go through files
+    for file, filepath in filedict.items():
+        # setup class directory name to check if it is a category we want to copy
+#         parent = os.path.basename(os.path.dirname(os.path.dirname(filepath)))
+#         print(parent)
+        subdir = os.path.basename(os.path.dirname(filepath))
+#         print(subdir)
+#         fullparent = os.path.join(sobel_dir + os.sep + parent + os.sep + subdir)
+        
+        # only copy files if in directories we want
+        if subdir in class_dirs:
+#             print(subdir)
+            # create symlink
+#             print(filepath)
+            destination_filepath = os.path.join(destination + dest_dir_name + os.sep + subdir + os.sep + file)
+#             print(destination_filepath)
+            # create class dir if it doesn't exist
+            destination_class_dir = os.path.join(destination + dest_dir_name + os.sep + subdir + os.sep)
+#             print(destination_class_dir)
+            if not os.path.isdir(destination_class_dir):
+                os.makedirs(destination_class_dir)
+            # create destination filepath
+            os.symlink(filepath, destination_filepath, target_is_directory=False)
+            # ln -s ~/source/* wild_est_after_exc/Established\ Campground/
+            counter += 1
+    print(f'{counter} files were created as symlinks.')
+    return filedict
+
 
 if __name__ == "__main__":
     pass
