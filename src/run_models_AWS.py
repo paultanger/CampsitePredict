@@ -27,7 +27,7 @@ def load_datasets(X_train_file, X_test_file):
     X_train_elem_spec = (TensorSpec(shape=(None, img_height, img_width, 3), dtype=float32, name=None), 
                         TensorSpec(shape=(None,), dtype=int32, name=None))
     X_test_elem_spec = (TensorSpec(shape=(img_height, img_width, 3), dtype=float32, name=None), 
-                        TensorSpec(shape=(None,), dtype=int32, name=None))
+                        TensorSpec(shape=(), dtype=int32, name=None))
 
     # get files
     X_train = load(X_train_file, element_spec=X_train_elem_spec, compression='GZIP', reader_func=None)
