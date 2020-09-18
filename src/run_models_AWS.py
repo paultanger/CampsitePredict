@@ -35,7 +35,7 @@ def load_datasets(X_train_file, X_test_file):
     return X_train, X_test
 
 
-def prep_data(X_train, X_test):
+def prep_data(X_train, X_test, batch_size):
     X_test = X_test.batch(batch_size)
     X_train = X_train.cache().shuffle(32, seed=42).prefetch(buffer_size=AUTOTUNE) 
     X_test = X_test.cache().prefetch(buffer_size=AUTOTUNE)
@@ -109,7 +109,7 @@ if __name__ == "__main__":
 
     # run steps
     X_train, X_test = load_datasets(X_train_data_path, X_test_data_path)
-    X_train, X_test = prep_data(X_train, X_test)
+    X_train, X_test = prep_data(X_train, X_test, batch_size)
     model = build_model()
 
     # check
