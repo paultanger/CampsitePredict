@@ -4,7 +4,9 @@
 .ipynb_checkpoints/
 .spyproject/
 /presentation/
-notebooks/logs/
+notebooks/logs
+/model_data/models
+/model_data/tensorboard_logs
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
