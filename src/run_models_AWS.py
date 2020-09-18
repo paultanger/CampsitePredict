@@ -24,9 +24,9 @@ import os
 
 def load_datasets(X_train_file, X_test_file):
     # set element spec
-    X_train_elem_spec = (TensorSpec(shape=(None, 256, 256, 3), dtype=float32,name=None), 
+    X_train_elem_spec = (TensorSpec(shape=(None, img_height, img_width, 3), dtype=float32, name=None), 
                         TensorSpec(shape=(None,), dtype=int32, name=None))
-    X_test_elem_spec = (TensorSpec(shape=(None, 256, 256, 3), dtype=float32, name=None), 
+    X_test_elem_spec = (TensorSpec(shape=(img_height, img_width, 3), dtype=float32, name=None), 
                         TensorSpec(shape=(None,), dtype=int32, name=None))
 
     # get files
@@ -36,7 +36,8 @@ def load_datasets(X_train_file, X_test_file):
 
 
 def prep_data(X_train, X_test):
-    X_train = X_train.cache().shuffle(32).prefetch(buffer_size=AUTOTUNE) 
+    X_test = X_test.batch(batch_size)
+    X_train = X_train.cache().shuffle(32, seed=42).prefetch(buffer_size=AUTOTUNE) 
     X_test = X_test.cache().prefetch(buffer_size=AUTOTUNE)
     return X_train, X_test
 
@@ -47,7 +48,7 @@ def build_model(model_dir=None):
         return model
     
     model = Sequential([
-        layers.experimental.preprocessing.Rescaling(1./255, input_shape=(256, 256, 3)),
+        layers.experimental.preprocessing.Rescaling(1./255, input_shape=(img_height, img_width, 3)),
         layers.experimental.preprocessing.RandomFlip("horizontal", 
                                                     input_shape=(img_height, 
                                                                 img_width,
@@ -63,7 +64,7 @@ def build_model(model_dir=None):
         layers.Conv2D(nb_filters*4, (kernel_size[0], kernel_size[1]), padding='same', activation='relu'),
         layers.MaxPooling2D(pool_size=pool_size),
         layers.Flatten(),
-        layers.Dense(256, activation='relu'),
+        layers.Dense(final_dense, activation='relu'),
         layers.Dropout(0.5),
         #layers.Dense(num_classes, activation='relu')
         layers.Dense(1, activation='sigmoid')
@@ -82,7 +83,7 @@ if __name__ == "__main__":
     # os.system('source activate tensorflow2_latest_p37')
     print(keras.__version__)
     print(tensorflow.__version__)
-    os.system('nvidia-smi')
+    # os.system('nvidia-smi')
 
     # path to files:
     X_train_data_path = '/content/drive/My Drive/TF_datasets/all_US_data/X_train'
@@ -91,12 +92,17 @@ if __name__ == "__main__":
     # get class names for plotting
     class_names = ['Est Camp', 'Wild Camp']
 
+    # 
+    batch_size = 32
+    img_size = 256
+    img_height = 256
+    img_width = 256
+    final_dense = 256
+
     # set params
     num_classes = 2
     epochs = 10 
     AUTOTUNE = data.experimental.AUTOTUNE
-    img_height = 256
-    img_width = 256
     nb_filters = 32    
     pool_size = (2, 2)  
     kernel_size = (2, 2) 
