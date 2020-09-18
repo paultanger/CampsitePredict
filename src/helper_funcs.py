@@ -219,6 +219,8 @@ def get_ROC_plot(ax, fpr_keras, tpr_keras, auc_keras, title):
     plt.legend(loc='best')
     return ax
 
+def multiclass_ROC_plot(ax, fpr_keras, tpr_keras, auc_keras, title):
+
 
 def get_imgs_into_df(X_test, y, predictions_binary_vec):
     '''
