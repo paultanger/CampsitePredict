@@ -130,8 +130,9 @@ if __name__ == "__main__":
     # aws s3 cp s3://my_bucket/my_folder/my_file.ext my_copied_file.ext
     # aws s3 cp s3://campsite-data/data data --recursive
     # os.system('source activate tensorflow2_latest_p37')
-    model_name = sys.argv[0]
-    directory = sys.argv[1]
+    model_name = sys.argv[1]
+    directory = sys.argv[2]
+    print(f'model name: {model_name} \n dir: {directory}')
     print(model_name)
     print(keras.__version__)
     print(tensorflow.__version__)
