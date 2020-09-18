@@ -13,7 +13,7 @@ from tensorflow.keras import layers
 from tensorflow.keras.models import Sequential
 from tensorflow.data.experimental import load
 from sklearn.metrics import classification_report, confusion_matrix
-from tensorflow.keras import callbacks
+from keras import callbacks
 
 # load helper funcs
 import sys
@@ -116,7 +116,7 @@ if __name__ == "__main__":
     print(model.summary())
 
     my_callbacks = [
-    callbacks.EarlyStopping(patience=5),
+    callbacks.EarlyStopping(patience=25),
     #     callbacks.ModelCheckpoint(
     #                         filepath='../data/tensorboard_models/model.{epoch:02d}-{val_loss:.2f}.h5', 
     #                         monitor='val_loss', 
@@ -126,7 +126,7 @@ if __name__ == "__main__":
     #                         mode='auto', 
     #                         save_freq='epoch', 
     #                         options=None),
-        callbacks.TensorBoard(log_dir='./tensorboard_logs',
+        callbacks.TensorBoard(log_dir='../tensorboard_logs',
                             histogram_freq=2,
                             write_graph=True,
                             write_images=True),
@@ -138,8 +138,46 @@ if __name__ == "__main__":
             validation_data = X_test,
             epochs = epochs,
             verbose = 2,
-            callbacks=my_callbacks
+#            callbacks=my_callbacks
 )
 
+    # name model
+    model_name = '200_epochs_all_US_model_wild_est_binary'
+
     # save model
-    model.save('./models/200_epochs_model_wild_est_binary')
+    model.save(f'../models/{model_name}')
+
+    # save model perf plot
+    fig, axs = plt.subplots(1, 2, figsize=(10, 8))
+    my_funcs.plot_train_val_acc(history, 5, model_name, axs)
+    plt.savefig(f'../images/{model_name}_model_perf_accuracy.png')
+
+    # save example images
+    num_samples = 10
+    figsize = (15,8)
+    my_funcs.plot_example_imgs(X_test, class_names, figsize, num_samples)
+    plt.savefig(f'../images/{model_name}_example_imgs.png')
+
+    # get and save conf mat and ROC
+    y, predictions, y_pred, y_pred_bin, fpr_keras, tpr_keras, thresholds_keras, auc_keras = my_funcs.run_model(model, X_test)
+    # classification report
+    class_report_dict = classification_report(y, y_pred_bin, output_dict=True)
+    class_report_df = pandas.DataFrame(class_report_dict).transpose()
+    class_report_df.to_csv(f'../data/{model_name}_classification_report.csv')
+    # ROC curve
+    fig, ax = plt.subplots(1, figsize=(10, 8))
+    ax = my_funcs.get_ROC_plot(ax, fpr_keras, tpr_keras, auc_keras, f'ROC curve - {model_name}')
+    plt.savefig(f'../images/{model_name}_ROC_curve.png')
+    # confusion matrix
+    confmat = my_funcs.compute_confusion_matrix(y, y_pred_bin)
+    x_labels = ['Predict: Established', 'Predict: Wild'] 
+    y_labels = ['Actual: Established', 'Actual: Wild']
+    fig, ax = plt.subplots(1, figsize = (8,6))
+    ax = my_funcs.plot_conf_matrix(confmat, ax, x_labels, y_labels, f'conf matrix for {model_name}')
+    # output some incorrect predictions
+    y_predictions_df = my_funcs.get_imgs_into_df(X_test, y, y_pred_bin)
+    wrong_imgs = y_predictions_df[y_predictions_df['predict'] != y_predictions_df['actual']]
+    num_samples = 10
+    figsize = (20,8)
+    fig, axs = my_funcs.plot_wrong_imgs(wrong_imgs, figsize, num_samples)
+    plt.savefig(f'../images/{model_name}_incorrect_predictions_sample.png')

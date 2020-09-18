@@ -293,7 +293,7 @@ def plot_example_imgs(X_test, figsize=(15, 15), num_samples=20):
     return fig, axs
 
 
-def plot_train_val_acc(history, epochs, ax):
+def plot_train_val_acc(history, epochs, model_name, axs):
     '''
     accepts model run history and number of epochs and fig ax
     plots train and val accuracy over epoch
@@ -301,23 +301,28 @@ def plot_train_val_acc(history, epochs, ax):
     acc = history.history['accuracy']
     val_acc = history.history['val_accuracy']
 
-    loss = history.history['loss']
-    val_loss = history.history['val_loss']
+    loss=history.history['loss']
+    val_loss=history.history['val_loss']
 
     epochs_range = range(epochs)
 
-    ax.plot(epochs_range, acc, label='Training Accuracy')
-    ax.plot(epochs_range, val_acc, label='Validation Accuracy')
-    plt.legend(loc='lower right')
-    ax.set_xlabel('epochs')
-    ax.set_title('Training and Validation Accuracy')
+    axs[0].plot(epochs_range, acc, label='Training Accuracy')
+    axs[0].plot(epochs_range, val_acc, label='Validation Accuracy')
+    axs[0].set_ylim(0, 1)
+    axs[0].set_ylabel('')
+    axs[0].set_xlabel('epochs')
+    axs[0].legend(loc='lower right')
+    axs[0].set_title('Training and Validation Accuracy')
 
-    ax.plot(epochs_range, loss, label='Training Loss')
-    ax.plot(epochs_range, val_loss, label='Validation Loss')
-    plt.legend(loc='upper right')
-    ax.set_xlabel('epochs')
-    ax.set_title('Training and Validation Loss')
-    return ax
+    axs[1].plot(epochs_range, loss, label='Training Loss')
+    axs[1].plot(epochs_range, val_loss, label='Validation Loss')
+    axs[1].set_ylim(0, 1)
+    axs[1].set_ylabel('')
+    axs[1].set_xlabel('epochs')
+    axs[1].legend(loc='upper right')
+    axs[1].set_title('Training and Validation Loss')
+    plt.suptitle(f'{model_name} performance')
+    return axs
 
 
 def run_kmeans(X, df, features, k):
