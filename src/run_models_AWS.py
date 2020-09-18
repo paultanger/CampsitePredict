@@ -108,7 +108,7 @@ if __name__ == "__main__":
     kernel_size = (2, 2) 
 
     # run steps
-    X_train, X_test = load_datasets(X_train_file, X_test_file)
+    X_train, X_test = load_datasets(X_train_data_path, X_test_data_path)
     X_train, X_test = prep_data(X_train, X_test)
     model = build_model()
 
