@@ -137,7 +137,7 @@ if __name__ == "__main__":
             X_train,
             validation_data = X_test,
             epochs = epochs,
-            verbose = 2
+            verbose = 2,
             callbacks=my_callbacks
 )
 
