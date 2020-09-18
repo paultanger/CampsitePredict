@@ -281,16 +281,20 @@ def plot_example_imgs(X_test,  class_names, figsize=(15, 15), num_samples=20):
 
     for i, ax in zip(samples, axs.flatten()):
         img = image_batch[i].numpy().astype("uint8")
-        label = labels_batch[i]
+        label = labels_batch[i].numpy().astype('int')
         # for some reason this doesn't work with loaddataset obj
         # if label:
         #     label = X_test.class_names[1]
         # else:
         #     label = X_test.class_names[0]
-        if label:
-            label = class_names[1]
-        else:
-            label = class_names[0]
+        # this only works for binary classes
+        # if label:
+        #     label = class_names[1]
+        # else:
+        #     label = class_names[0]
+        #  multiclass solution
+        class_names = np.array(class_names)
+        class_names[label>0][0]
         ax.imshow(img)
         ax.set_title(f'label: {label}')
         ax.axis('off')
