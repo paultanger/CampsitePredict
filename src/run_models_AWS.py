@@ -86,8 +86,8 @@ if __name__ == "__main__":
     # os.system('nvidia-smi')
 
     # path to files:
-    X_train_data_path = '~/data/all_US_data/X_train_256px_32batch'
-    X_test_data_path = '~data/all_US_data/X_test_256px_unbatched'
+    X_train_data_path = '/home/ec2-user/data/all_US_data/X_train_256px_32batch'
+    X_test_data_path = '/home/ec2-user/data/all_US_data/X_test_256px_unbatched'
 
     # get class names for plotting
     class_names = ['Est Camp', 'Wild Camp']
