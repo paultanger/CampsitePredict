@@ -101,7 +101,7 @@ if __name__ == "__main__":
 
     # set params
     num_classes = 2
-    epochs = 10 
+    epochs = 200 
     AUTOTUNE = data.experimental.AUTOTUNE
     nb_filters = 32    
     pool_size = (2, 2)  
@@ -126,7 +126,7 @@ if __name__ == "__main__":
     #                         mode='auto', 
     #                         save_freq='epoch', 
     #                         options=None),
-        callbacks.TensorBoard(log_dir='./logs',
+        callbacks.TensorBoard(log_dir='./tensorboard_logs',
                             histogram_freq=2,
                             write_graph=True,
                             write_images=True),
@@ -138,5 +138,8 @@ if __name__ == "__main__":
             validation_data = X_test,
             epochs = epochs,
             verbose = 2
-            # callbacks=my_callbacks
+            callbacks=my_callbacks
 )
+
+    # save model
+    model.save('./models/200_epochs_model_wild_est_binary')
