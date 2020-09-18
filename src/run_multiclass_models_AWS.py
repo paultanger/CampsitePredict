@@ -131,6 +131,7 @@ if __name__ == "__main__":
     # aws s3 cp s3://campsite-data/data data --recursive
     # os.system('source activate tensorflow2_latest_p37')
     model_name = sys.argv[0]
+    directory = sys.argv[1]
     print(model_name)
     print(keras.__version__)
     print(tensorflow.__version__)
@@ -140,7 +141,7 @@ if __name__ == "__main__":
     X_train_data_path = '/home/ec2-user/data/all_US_data/X_train_256px_32batch'
     X_test_data_path = '/home/ec2-user/data/all_US_data/X_test_256px_unbatched'
     # raw data:
-    directory = '/home/ec2-user/data/all_US_unaugmented'
+    # directory = '/home/ec2-user/data/all_US_unaugmented'
 
     # 
     batch_size = 32
@@ -191,7 +192,7 @@ if __name__ == "__main__":
             X_train,
             validation_data = X_test,
             epochs = epochs,
-            class_weights = class_weights,
+            class_weight = class_weights,
             verbose = 2,
 #            callbacks=my_callbacks
 )
