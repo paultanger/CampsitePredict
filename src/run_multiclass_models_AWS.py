@@ -6,6 +6,7 @@ import tensorflow
 from tensorflow import keras
 
 import os
+import sys
 
 from tensorflow import TensorSpec, float32, int32
 from tensorflow import data
@@ -129,6 +130,8 @@ if __name__ == "__main__":
     # aws s3 cp s3://my_bucket/my_folder/my_file.ext my_copied_file.ext
     # aws s3 cp s3://campsite-data/data data --recursive
     # os.system('source activate tensorflow2_latest_p37')
+    model_name = sys.argv[0]
+    print(model_name)
     print(keras.__version__)
     print(tensorflow.__version__)
     # os.system('nvidia-smi')
@@ -149,7 +152,7 @@ if __name__ == "__main__":
     # run steps
     # X_train, X_test = load_datasets(X_train_data_path, X_test_data_path)
     # or with data not datasets
-    X_train, X_test, X_holdout = load_data_from_dir(directory, batch_size, img_size)
+    X_train, X_test, X_holdout = load_data_from_dir(directory, batch_size, img_size, 2568)
     # get class names for plotting and weights
     class_names, class_weights = get_class_weights(X_train)
     # set params
@@ -160,8 +163,8 @@ if __name__ == "__main__":
     pool_size = (2, 2)  
     kernel_size = (2, 2) 
 
-    X_train, X_test = prep_data(X_train, X_test)
-    model = build_model()
+    X_train, X_test = prep_data(X_train, X_test, batch_size=batch_size)
+    model = build_model(num_classes, nb_filters, kernel_size, pool_size, img_height, img_width, final_dense)
 
     # check
     print(model.summary())
@@ -194,8 +197,8 @@ if __name__ == "__main__":
 )
 
     # name model
-    model_name = '200_epochs_all_US_model_wild_est_binary'
-    model_name = 'test_all_US_model_wild_est_binary'
+    # model_name = '200_epochs_all_US_model_wild_est_binary'
+    # model_name = 'test_all_US_model_wild_est_binary'
 
     # save model
     model.save(f'../model_data/models/{model_name}')
