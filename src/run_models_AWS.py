@@ -13,7 +13,9 @@ from tensorflow.keras import layers
 from tensorflow.keras.models import Sequential
 from tensorflow.data.experimental import load
 from sklearn.metrics import classification_report, confusion_matrix
-from keras import callbacks
+from tensorflow.keras import callbacks
+from tensorflow.keras.preprocessing import image_dataset_from_directory
+
 
 # load helper funcs
 import sys
@@ -34,9 +36,42 @@ def load_datasets(X_train_file, X_test_file):
     X_test = load(X_test_file, element_spec=X_test_elem_spec, compression='GZIP', reader_func=None)
     return X_train, X_test
 
+def load_data_from_dir(directory, batch_size, img_size):
+    X_train = image_dataset_from_directory(
+    directory, labels='inferred', class_names=None, 
+    color_mode='rgb', batch_size=batch_size, image_size=(img_size, img_size), shuffle=True, seed=42,
+    validation_split=0.25, subset='training', interpolation='bilinear', follow_links=True
+    )
+    # batch size needs to be hard coded to split for holdout
+    testsize = 1968
+    X_test = image_dataset_from_directory(
+    directory, labels='inferred', class_names=None, 
+    color_mode='rgb', batch_size=testsize, image_size=(img_size, img_size), shuffle=True, seed=42, 
+    validation_split=0.25, subset='validation', interpolation='bilinear', follow_links=True
+    )
 
-def prep_data(X_train, X_test, batch_size):
-    X_test = X_test.batch(batch_size)
+    # calc sizes
+    holdout_size = int(0.2 * testsize)
+    test_size = testsize - holdout_size
+    print(f' holdout size: {holdout_size}, test size: {test_size}')
+
+    # pull X and y in tensors
+    X_test_images, X_test_labels = next(iter(X_test))
+    # split the first into holdout
+    X_holdout_images = X_test_images[:holdout_size,...]
+    X_holdout_labels = X_test_labels[:holdout_size]
+    # put the rest in X_test
+    X_test_images = X_test_images[holdout_size:,...]
+    X_test_labels = X_test_labels[holdout_size:]
+    # put into datasets
+    X_test1 = tensorflow.data.Dataset.from_tensor_slices((X_test_images, X_test_labels))
+    X_holdout1 = tensorflow.data.Dataset.from_tensor_slices((X_holdout_images, X_holdout_labels))
+
+    return X_train, X_test1, X_holdout1
+
+def prep_data(X_train, X_test, batch_size=None):
+    if batch_size:
+        X_test = X_test.batch(batch_size)
     X_train = X_train.cache().shuffle(32, seed=42).prefetch(buffer_size=AUTOTUNE) 
     X_test = X_test.cache().prefetch(buffer_size=AUTOTUNE)
     return X_train, X_test
@@ -88,6 +123,8 @@ if __name__ == "__main__":
     # path to files:
     X_train_data_path = '/home/ec2-user/data/all_US_data/X_train_256px_32batch'
     X_test_data_path = '/home/ec2-user/data/all_US_data/X_test_256px_unbatched'
+    # raw data:
+    directory = '/home/ec2-user/data/all_US_unaugmented'
 
     # get class names for plotting
     class_names = ['Est Camp', 'Wild Camp']
@@ -101,14 +138,16 @@ if __name__ == "__main__":
 
     # set params
     num_classes = 2
-    epochs = 200 
+    epochs = 10 
     AUTOTUNE = data.experimental.AUTOTUNE
     nb_filters = 32    
     pool_size = (2, 2)  
     kernel_size = (2, 2) 
 
     # run steps
-    X_train, X_test = load_datasets(X_train_data_path, X_test_data_path)
+    # X_train, X_test = load_datasets(X_train_data_path, X_test_data_path)
+    # or with data not datasets
+    X_train, X_test, X_holdout = load_data_from_dir(directory, batch_size, img_size)
     X_train, X_test = prep_data(X_train, X_test, batch_size)
     model = build_model()
 
@@ -143,6 +182,7 @@ if __name__ == "__main__":
 
     # name model
     model_name = '200_epochs_all_US_model_wild_est_binary'
+    model_name = 'test_all_US_model_wild_est_binary'
 
     # save model
     model.save(f'../model_data/models/{model_name}')
@@ -174,6 +214,7 @@ if __name__ == "__main__":
     y_labels = ['Actual: Established', 'Actual: Wild']
     fig, ax = plt.subplots(1, figsize = (8,6))
     ax = my_funcs.plot_conf_matrix(confmat, ax, x_labels, y_labels, f'conf matrix for {model_name}')
+    plt.savefig(f'../model_data/plots/{model_name}_conf_matrix.png')
     # output some incorrect predictions
     y_predictions_df = my_funcs.get_imgs_into_df(X_test, y, y_pred_bin)
     wrong_imgs = y_predictions_df[y_predictions_df['predict'] != y_predictions_df['actual']]
