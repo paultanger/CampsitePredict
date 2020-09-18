@@ -265,7 +265,7 @@ def plot_wrong_imgs(wrong_imgs, figsize=(15, 15), num_samples=20):
     return fig, axs
 
 
-def plot_example_imgs(X_test, figsize=(15, 15), num_samples=20):
+def plot_example_imgs(X_test,  class_names, figsize=(15, 15), num_samples=20):
     '''
     accepts a tf dataset of images
     plots a grid with sample images
@@ -282,10 +282,15 @@ def plot_example_imgs(X_test, figsize=(15, 15), num_samples=20):
     for i, ax in zip(samples, axs.flatten()):
         img = image_batch[i].numpy().astype("uint8")
         label = labels_batch[i]
+        # for some reason this doesn't work with loaddataset obj
+        # if label:
+        #     label = X_test.class_names[1]
+        # else:
+        #     label = X_test.class_names[0]
         if label:
-            label = X_test.class_names[1]
+            label = class_names[1]
         else:
-            label = X_test.class_names[0]
+            label = class_names[0]
         ax.imshow(img)
         ax.set_title(f'label: {label}')
         ax.axis('off')

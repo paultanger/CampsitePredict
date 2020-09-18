@@ -18,8 +18,8 @@ from keras import callbacks
 # load helper funcs
 import sys
 import os
-# sys.path.append(os.path.join(os.path.dirname(sys.path[0]),'/content/drive/My Drive/src'))
-# import helper_funcs as my_funcs
+sys.path.append(os.path.join(os.path.dirname(sys.path[0]), './'))
+import helper_funcs as my_funcs
 
 
 def load_datasets(X_train_file, X_test_file):
@@ -145,29 +145,29 @@ if __name__ == "__main__":
     model_name = '200_epochs_all_US_model_wild_est_binary'
 
     # save model
-    model.save(f'../models/{model_name}')
+    model.save(f'../model_data/models/{model_name}')
 
     # save model perf plot
     fig, axs = plt.subplots(1, 2, figsize=(10, 8))
-    my_funcs.plot_train_val_acc(history, 5, model_name, axs)
-    plt.savefig(f'../images/{model_name}_model_perf_accuracy.png')
+    my_funcs.plot_train_val_acc(history, epochs, model_name, axs)
+    plt.savefig(f'../model_data/plots/{model_name}_model_perf_accuracy.png')
 
     # save example images
     num_samples = 10
     figsize = (15,8)
     my_funcs.plot_example_imgs(X_test, class_names, figsize, num_samples)
-    plt.savefig(f'../images/{model_name}_example_imgs.png')
+    plt.savefig(f'../model_data/plots/{model_name}_example_imgs.png')
 
     # get and save conf mat and ROC
     y, predictions, y_pred, y_pred_bin, fpr_keras, tpr_keras, thresholds_keras, auc_keras = my_funcs.run_model(model, X_test)
     # classification report
     class_report_dict = classification_report(y, y_pred_bin, output_dict=True)
-    class_report_df = pandas.DataFrame(class_report_dict).transpose()
-    class_report_df.to_csv(f'../data/{model_name}_classification_report.csv')
+    class_report_df = pd.DataFrame(class_report_dict).transpose()
+    class_report_df.to_csv(f'../model_data/data/{model_name}_classification_report.csv')
     # ROC curve
     fig, ax = plt.subplots(1, figsize=(10, 8))
     ax = my_funcs.get_ROC_plot(ax, fpr_keras, tpr_keras, auc_keras, f'ROC curve - {model_name}')
-    plt.savefig(f'../images/{model_name}_ROC_curve.png')
+    plt.savefig(f'../model_data/plots/{model_name}_ROC_curve.png')
     # confusion matrix
     confmat = my_funcs.compute_confusion_matrix(y, y_pred_bin)
     x_labels = ['Predict: Established', 'Predict: Wild'] 
@@ -180,4 +180,4 @@ if __name__ == "__main__":
     num_samples = 10
     figsize = (20,8)
     fig, axs = my_funcs.plot_wrong_imgs(wrong_imgs, figsize, num_samples)
-    plt.savefig(f'../images/{model_name}_incorrect_predictions_sample.png')
+    plt.savefig(f'../model_data/plots/{model_name}_incorrect_predictions_sample.png')
