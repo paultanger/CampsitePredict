@@ -294,7 +294,10 @@ def plot_example_imgs(X_test,  class_names, figsize=(15, 15), num_samples=20):
         #     label = class_names[0]
         #  multiclass solution
         class_names = np.array(class_names)
-        label = class_names[label>0][0]
+        if len(class_names) < 3:
+            label = class_names[label>0]
+        else:
+            label = class_names[label>0][0]
         ax.imshow(img)
         ax.set_title(f'label: {label}')
         ax.axis('off')
