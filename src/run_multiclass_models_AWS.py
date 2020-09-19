@@ -296,7 +296,8 @@ if __name__ == "__main__":
     plt.savefig(f'../model_data/plots/{model_name}_ROC_curve.png')
     # confusion matrix
     confmat = confusion_matrix(y.argmax(axis=1), predictions.argmax(axis=1), normalize='all')
-    labels = [f'pred: {x}' for x in class_names] 
+    xlabels = [f'actual: {x}' for x in class_names] 
+    ylabels = [f'pred: {x}' for x in class_names] 
     fig, ax = plt.subplots(1, figsize = (8,6))
     ax = my_funcs.plot_conf_matrix(confmat, ax, labels, labels, f'conf matrix for {model_name}')
     plt.savefig(f'../model_data/plots/{model_name}_conf_matrix.png')
