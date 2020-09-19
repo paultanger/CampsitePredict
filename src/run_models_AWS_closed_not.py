@@ -77,6 +77,11 @@ if __name__ == "__main__":
                             write_images=True),
     ]
 
+    # change metrics
+    model.compile(optimizer='adam', # adadelta sgd
+              loss=keras.losses.BinaryCrossentropy(from_logits=False),
+              metrics=['recall'])
+    
     # fit model
     history = model.fit(
             X_train,
