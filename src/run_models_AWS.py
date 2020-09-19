@@ -166,7 +166,7 @@ if __name__ == "__main__":
 
     # run steps
     X_train, X_test = prep_data(X_train, X_test, batch_size)
-    model = build_model_imb(num_classes, nb_filters, kernel_size, pool_size, img_height, img_width, final_dense, output_bias)
+    model = build_model(num_classes, nb_filters, kernel_size, pool_size, img_height, img_width, final_dense)
 
     # check
     print(model.summary())
