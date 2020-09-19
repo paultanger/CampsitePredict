@@ -16,7 +16,7 @@ from tensorflow.data.experimental import load
 from sklearn.metrics import classification_report, confusion_matrix, roc_curve, auc
 from tensorflow.keras import callbacks
 from tensorflow.keras.preprocessing import image_dataset_from_directory
-
+from keras import optimizers
 
 # load helper funcs
 import sys
@@ -111,13 +111,15 @@ def build_model(num_classes, nb_filters, kernel_size, pool_size, img_height, img
         layers.MaxPooling2D(pool_size=pool_size),
         layers.Flatten(),
         layers.Dense(final_dense, activation='relu'),
-        layers.Dropout(0.5),
+        layers.Dropout(0.3),
         # layers.Dense(128, activation='softmax'),
         layers.Dense(num_classes, activation='softmax')
         # layers.Dense(1, activation='sigmoid')
         ])
 
-    model.compile(optimizer='adam', # adadelta sgd
+    slow_adam = optimizers.Adam(learning_rate=0.0001)
+
+    model.compile(optimizer=slow_adam, #'adam', # adadelta sgd
             #   loss=keras.losses.BinaryCrossentropy(from_logits=False),
             #   metrics=['accuracy'])
             loss=keras.losses.CategoricalCrossentropy(from_logits=True),
