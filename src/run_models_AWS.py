@@ -143,43 +143,30 @@ def build_model_imb(num_classes, nb_filters, kernel_size, pool_size, img_height,
 
 
 if __name__ == "__main__":
-    # aws s3 cp s3://my_bucket/my_folder/my_file.ext my_copied_file.ext
-    # aws s3 cp s3://campsite-data/data data --recursive
-    # os.system('source activate tensorflow2_latest_p37')
-    print(keras.__version__)
     print(tensorflow.__version__)
-    # os.system('nvidia-smi')
+    model_name = sys.argv[1]
+    directory = sys.argv[2]
+    test_data_size = int(sys.argv[3])
+    epochs = int(sys.argv[4])
+    batch_size = int(sys.argv[5])
 
-    # path to files:
-    X_train_data_path = '/home/ec2-user/data/all_US_data/X_train_256px_32batch'
-    X_test_data_path = '/home/ec2-user/data/all_US_data/X_test_256px_unbatched'
     # raw data:
     directory = '/home/ec2-user/data/all_US_unaugmented'
 
-    # get class names for plotting
-    class_names = ['Est Camp', 'Wild Camp']
-
-    # 
-    batch_size = 32
-    img_size = 256
-    img_height = 256
-    img_width = 256
-    final_dense = 256
-
+    X_train, X_test, X_holdout = load_data_from_dir(directory, batch_size, img_size, test_data_size)
+    # get class names for plotting and weights
+    class_names, class_weights = get_class_weights(X_train)
     # set params
-    num_classes = 2
-    epochs = 10 
+    num_classes = len(X_train.class_names)
+    # epochs = 10 
     AUTOTUNE = data.experimental.AUTOTUNE
     nb_filters = 32    
     pool_size = (2, 2)  
     kernel_size = (2, 2) 
 
     # run steps
-    # X_train, X_test = load_datasets(X_train_data_path, X_test_data_path)
-    # or with data not datasets
-    X_train, X_test, X_holdout = load_data_from_dir(directory, batch_size, img_size)
     X_train, X_test = prep_data(X_train, X_test, batch_size)
-    model = build_model()
+    model = build_model_imb(num_classes, nb_filters, kernel_size, pool_size, img_height, img_width, final_dense, output_bias)
 
     # check
     print(model.summary())
@@ -210,10 +197,6 @@ if __name__ == "__main__":
 #            callbacks=my_callbacks
 )
 
-    # name model
-    model_name = '200_epochs_all_US_model_wild_est_binary'
-    model_name = 'test_all_US_model_wild_est_binary'
-
     # save model
     model.save(f'../model_data/models/{model_name}')
 
@@ -240,8 +223,7 @@ if __name__ == "__main__":
     plt.savefig(f'../model_data/plots/{model_name}_ROC_curve.png')
     # confusion matrix
     confmat = my_funcs.compute_confusion_matrix(y, y_pred_bin)
-    x_labels = ['Predict: Established', 'Predict: Wild'] 
-    y_labels = ['Actual: Established', 'Actual: Wild']
+    labels = [f'pred: {x}' for x in class_names]
     fig, ax = plt.subplots(1, figsize = (8,6))
     ax = my_funcs.plot_conf_matrix(confmat, ax, x_labels, y_labels, f'conf matrix for {model_name}')
     plt.savefig(f'../model_data/plots/{model_name}_conf_matrix.png')
