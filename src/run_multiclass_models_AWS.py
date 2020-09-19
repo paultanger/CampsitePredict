@@ -190,6 +190,7 @@ if __name__ == "__main__":
     # os.system('source activate tensorflow2_latest_p37')
     model_name = sys.argv[1]
     directory = sys.argv[2]
+    test_data_size = sys.argv[3]
     print(f'model name: {model_name} \n dir: {directory}')
     print(model_name)
     print(keras.__version__)
@@ -212,7 +213,7 @@ if __name__ == "__main__":
     # run steps
     # X_train, X_test = load_datasets(X_train_data_path, X_test_data_path)
     # or with data not datasets
-    X_train, X_test, X_holdout = load_data_from_dir(directory, batch_size, img_size, 2568)
+    X_train, X_test, X_holdout = load_data_from_dir(directory, batch_size, img_size, test_data_size)
     # get class names for plotting and weights
     class_names, class_weights = get_class_weights(X_train)
     # set params
