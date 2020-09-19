@@ -113,7 +113,7 @@ def build_model(num_classes, nb_filters, kernel_size, pool_size, img_height, img
         layers.Dense(final_dense, activation='relu'),
         layers.Dropout(0.5),
         # layers.Dense(128, activation='softmax'),
-        layers.Dense(num_classes, activation='relu')
+        layers.Dense(num_classes, activation='softmax')
         # layers.Dense(1, activation='sigmoid')
         ])
 
@@ -288,7 +288,7 @@ if __name__ == "__main__":
     multiclass_ROC_plot(class_names, y, predictions, ax, f'multi-class ROC for {model_name}')
     plt.savefig(f'../model_data/plots/{model_name}_ROC_curve.png')
     # confusion matrix
-    confmat = confusion_matrix(y_true_class.argmax(axis=1), y_pred_class.argmax(axis=1), normalize='all')
+    confmat = confusion_matrix(y.argmax(axis=1), predictions.argmax(axis=1), normalize='all')
     labels = [f'pred: {x}' for x in class_names] 
     fig, ax = plt.subplots(1, figsize = (8,6))
     ax = my_funcs.plot_conf_matrix(confmat, ax, labels, labels, f'conf matrix for {model_name}')
