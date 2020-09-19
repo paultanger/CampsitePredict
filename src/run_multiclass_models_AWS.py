@@ -190,8 +190,9 @@ if __name__ == "__main__":
     # os.system('source activate tensorflow2_latest_p37')
     model_name = sys.argv[1]
     directory = sys.argv[2]
-    test_data_size = sys.argv[3]
-    epochs = sys.argv[4]
+    test_data_size = int(sys.argv[3])
+    epochs = int(sys.argv[4])
+    print(epochs)
     print(f'model name: {model_name} \n dir: {directory}')
     print(model_name)
     print(keras.__version__)
