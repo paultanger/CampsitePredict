@@ -77,17 +77,15 @@ def prep_data(X_train, X_test, batch_size=None):
     return X_train, X_test
 
 
-def build_model(model_dir=None):
+def build_model(num_classes, nb_filters, kernel_size, pool_size, img_height, img_width, final_dense, model_dir=None):
     if model_dir:
         model = keras.models.load_model(model_dir)
         return model
     
     model = Sequential([
-        layers.experimental.preprocessing.Rescaling(1./255, input_shape=(img_height, img_width, 3)),
+        layers.experimental.preprocessing.Rescaling(1./255, input_shape=input_shape),
         layers.experimental.preprocessing.RandomFlip("horizontal", 
-                                                    input_shape=(img_height, 
-                                                                img_width,
-                                                                3)),
+                                                    input_shape=input_shape),
         layers.experimental.preprocessing.RandomRotation(0.1),
         layers.experimental.preprocessing.RandomZoom(0.1),
         layers.Conv2D(nb_filters, (kernel_size[0], kernel_size[1]), padding='same', activation='relu'), # was 16, 32, 64
