@@ -560,6 +560,20 @@ def make_symlinks_only_unaugmented(directory, destination, dest_dir_name, class_
     print(f'{counter} files were created as symlinks.')
     return filedict
 
-
+def get_class_weights(X_train):
+    class_names = X_train.class_names
+    labels = np.concatenate([y for x, y in X_train], axis=0)
+    if np.ndim(labels) == 1:
+        # for binary
+        weights = [len(labels) - labels.sum(), labels.sum()]
+    else:
+        weights = list(np.sum(labels, axis=0))
+    class_weights = {}
+    # for class_, weight in zip(class_names, weights):
+    #     class_weights[class_] = weight
+    for i, weight in enumerate(weights):
+        class_weights[i] = weight
+    return class_names, class_weights
+    
 if __name__ == "__main__":
     pass
