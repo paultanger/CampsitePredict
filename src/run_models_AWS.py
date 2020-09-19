@@ -105,7 +105,39 @@ def build_model(num_classes, nb_filters, kernel_size, pool_size, img_height, img
 
     model.compile(optimizer='adam', # adadelta sgd
               loss=keras.losses.BinaryCrossentropy(from_logits=False),
-              metrics=['accuracy'])
+              metrics=['accuracy', 'Recall'])
+
+    return model
+
+def build_model_imb(num_classes, nb_filters, kernel_size, pool_size, img_height, img_width, final_dense, output_bias, model_dir=None):
+    if model_dir:
+        model = keras.models.load_model(model_dir)
+        return model
+    
+    model = Sequential([
+        layers.experimental.preprocessing.Rescaling(1./255, input_shape=(img_height, img_width, 3)),
+        layers.experimental.preprocessing.RandomFlip("horizontal", 
+                                                    input_shape=(img_height, img_width, 3)),
+        layers.experimental.preprocessing.RandomRotation(0.1),
+        layers.experimental.preprocessing.RandomZoom(0.1),
+        layers.Conv2D(nb_filters, (kernel_size[0], kernel_size[1]), padding='same', activation='relu'), # was 16, 32, 64
+        layers.MaxPooling2D(pool_size=pool_size),
+        layers.Conv2D(nb_filters*2, (kernel_size[0], kernel_size[1]), padding='same', activation='relu'), # drop layers.. for initial testing
+        layers.MaxPooling2D(pool_size=pool_size),
+        layers.Conv2D(nb_filters*3, (kernel_size[0], kernel_size[1]), padding='same', activation='relu'),
+        layers.MaxPooling2D(pool_size=pool_size),
+        layers.Conv2D(nb_filters*4, (kernel_size[0], kernel_size[1]), padding='same', activation='relu'),
+        layers.MaxPooling2D(pool_size=pool_size),
+        layers.Flatten(),
+        layers.Dense(final_dense, activation='relu'),
+        layers.Dropout(0.5),
+        #layers.Dense(num_classes, activation='relu')
+        layers.Dense(1, activation='sigmoid', bias_initializer=output_bias)
+        ])
+
+    model.compile(optimizer='adam', # adadelta sgd
+              loss=keras.losses.BinaryCrossentropy(from_logits=False),
+              metrics=['accuracy', 'Recall'])
 
     return model
 

@@ -23,7 +23,7 @@ import os
 sys.path.append(os.path.join(os.path.dirname(sys.path[0]), './'))
 import helper_funcs as my_funcs
 from  run_multiclass_models_AWS import prep_data, get_class_weights
-from  run_models_AWS import load_data_from_dir, build_model
+from  run_models_AWS import load_data_from_dir, build_model_imb
 
 
 if __name__ == "__main__":
@@ -54,8 +54,12 @@ if __name__ == "__main__":
     pool_size = (2, 2)  
     kernel_size = (2, 2) 
 
+    # calc bias
+    bias = np.array(list(class_weights.values())) 
+    output_bias = np.log(bias[0] / bias[1])
+
     X_train, X_test = prep_data(X_train, X_test, batch_size)
-    model = build_model(num_classes, nb_filters, kernel_size, pool_size, img_height, img_width, final_dense)
+    model = build_model_imb(num_classes, nb_filters, kernel_size, pool_size, img_height, img_width, final_dense, output_bias)
 
     # check
     print(model.summary())
@@ -77,10 +81,6 @@ if __name__ == "__main__":
                             write_images=True),
     ]
 
-    # change metrics
-    model.compile(optimizer='adam', # adadelta sgd
-              loss=keras.losses.BinaryCrossentropy(from_logits=False),
-              metrics=['recall'])
     
     # fit model
     history = model.fit(
