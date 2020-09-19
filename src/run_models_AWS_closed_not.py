@@ -83,6 +83,7 @@ if __name__ == "__main__":
             validation_data = X_test,
             epochs = epochs,
             verbose = 2,
+            class_weight = class_weights
 #            callbacks=my_callbacks
 )
 
