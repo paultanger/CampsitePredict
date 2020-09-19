@@ -11,7 +11,7 @@ import time
 import random
 import os
 from sklearn import metrics
-from sklearn.metrics import classification_report, confusion_matrix
+from sklearn.metrics import classification_report, confusion_matrix, roc_curve
 from random import choices
 from sklearn.cluster import KMeans
 from collections import Counter
@@ -219,8 +219,6 @@ def get_ROC_plot(ax, fpr_keras, tpr_keras, auc_keras, title):
     plt.legend(loc='best')
     return ax
 
-def multiclass_ROC_plot(ax, fpr_keras, tpr_keras, auc_keras, title):
-
 
 def get_imgs_into_df(X_test, y, predictions_binary_vec):
     '''
@@ -296,7 +294,7 @@ def plot_example_imgs(X_test,  class_names, figsize=(15, 15), num_samples=20):
         #     label = class_names[0]
         #  multiclass solution
         class_names = np.array(class_names)
-        class_names[label>0][0]
+        label = class_names[label>0][0]
         ax.imshow(img)
         ax.set_title(f'label: {label}')
         ax.axis('off')

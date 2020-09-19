@@ -11,9 +11,9 @@ import sys
 from tensorflow import TensorSpec, float32, int32
 from tensorflow import data
 from tensorflow.keras import layers
-from tensorflow.keras.models import Sequential
+from tensorflow.keras.models import Sequential, load_model
 from tensorflow.data.experimental import load
-from sklearn.metrics import classification_report, confusion_matrix
+from sklearn.metrics import classification_report, confusion_matrix, roc_curve, auc
 from tensorflow.keras import callbacks
 from tensorflow.keras.preprocessing import image_dataset_from_directory
 
@@ -125,6 +125,64 @@ def build_model(num_classes, nb_filters, kernel_size, pool_size, img_height, img
 
     return model
 
+def get_preds(model, X_test):
+    '''
+    requires numpy as np and sklearn metrics
+    gets model predictions from keras model
+    returns: y, predictions, y_pred, y_pred_bin, fpr_keras, tpr_keras,
+    thresholds_keras, auc_keras
+    '''
+    predictions = model.predict(X_test, verbose=2)
+    # y_pred_bin = (predictions > 0.5).astype("int32")
+    y = np.concatenate([y for x, y in X_test], axis=0)
+    y_pred = predictions.ravel()
+    # fpr_keras, tpr_keras, thresholds_keras = metrics.roc_curve(y, y_pred)
+    # auc_keras = metrics.auc(fpr_keras, tpr_keras)
+    return y, predictions, y_pred, #y_pred_bin, fpr_keras, tpr_keras, thresholds_keras, auc_keras
+
+def multiclass_ROC_plot(class_names, y_test, y_score, ax, title):
+    # Compute ROC curve and ROC area for each class
+    n_classes = len(class_names)
+    fpr = dict()
+    tpr = dict()
+    roc_auc = dict()
+    for i in range(n_classes):
+        fpr[i], tpr[i], _ = roc_curve(y_test[:, i], y_score[:, i])
+        roc_auc[i] = auc(fpr[i], tpr[i])
+
+    # Compute micro-average ROC curve and ROC area
+    fpr["micro"], tpr["micro"], _ = roc_curve(y_test.ravel(), y_score.ravel())
+    roc_auc["micro"] = auc(fpr["micro"], tpr["micro"])
+
+    # Plot of a ROC curve for a specific class
+    #     plt.figure()
+    #     plt.plot(fpr[2], tpr[2], label='ROC curve (area = %0.2f)' % roc_auc[2])
+    #     plt.plot([0, 1], [0, 1], 'k--')
+    #     plt.xlim([0.0, 1.0])
+    #     plt.ylim([0.0, 1.05])
+    #     plt.xlabel('False Positive Rate')
+    #     plt.ylabel('True Positive Rate')
+    #     plt.title(title)
+    #     plt.legend(loc="lower right")
+    #     plt.show()
+
+        # Plot ROC curve
+    #     plt.figure()
+    ax.plot(fpr["micro"], tpr["micro"],
+            label='micro-average ROC curve (area = {0:0.2f})'
+                ''.format(roc_auc["micro"]))
+    for i in range(n_classes):
+        ax.plot(fpr[i], tpr[i], label='ROC curve of class {0} (area = {1:0.2f})'
+                                    ''.format(class_names[i], roc_auc[i]))
+
+    ax.plot([0, 1], [0, 1], 'k--')
+    ax.set_xlim([0.0, 1.0])
+    ax.set_ylim([0.0, 1.05])
+    ax.set_xlabel('False Positive Rate')
+    ax.set_ylabel('True Positive Rate')
+    plt.title(title)
+    plt.legend(loc="lower right")
+    return ax
 
 if __name__ == "__main__":
     # aws s3 cp s3://my_bucket/my_folder/my_file.ext my_copied_file.ext
@@ -217,26 +275,25 @@ if __name__ == "__main__":
     plt.savefig(f'../model_data/plots/{model_name}_example_imgs.png')
 
     # get and save conf mat and ROC
-    y, predictions, y_pred, y_pred_bin, fpr_keras, tpr_keras, thresholds_keras, auc_keras = my_funcs.run_model(model, X_test)
+    y, predictions, y_pred = get_preds(model, X_test)
     # classification report
-    class_report_dict = classification_report(y, y_pred_bin, output_dict=True)
-    class_report_df = pd.DataFrame(class_report_dict).transpose()
-    class_report_df.to_csv(f'../model_data/data/{model_name}_classification_report.csv')
+    # class_report_dict = classification_report(y, y_pred_bin, output_dict=True)
+    # class_report_df = pd.DataFrame(class_report_dict).transpose()
+    # class_report_df.to_csv(f'../model_data/data/{model_name}_classification_report.csv')
     # ROC curve
     fig, ax = plt.subplots(1, figsize=(10, 8))
-    ax = my_funcs.get_ROC_plot(ax, fpr_keras, tpr_keras, auc_keras, f'ROC curve - {model_name}')
+    multiclass_funcs.multiclass_ROC_plot(class_names, y, predictions, ax, f'multi-class ROC for {model_name}')
     plt.savefig(f'../model_data/plots/{model_name}_ROC_curve.png')
     # confusion matrix
-    confmat = my_funcs.compute_confusion_matrix(y, y_pred_bin)
-    x_labels = ['Predict: Established', 'Predict: Wild'] 
-    y_labels = ['Actual: Established', 'Actual: Wild']
+    confmat = confusion_matrix(y_true_class.argmax(axis=1), y_pred_class.argmax(axis=1), normalize='all')
+    labels = [f'pred: {x}' for x in class_names] 
     fig, ax = plt.subplots(1, figsize = (8,6))
-    ax = my_funcs.plot_conf_matrix(confmat, ax, x_labels, y_labels, f'conf matrix for {model_name}')
+    ax = my_funcs.plot_conf_matrix(confmat, ax, labels, labels, f'conf matrix for {model_name}')
     plt.savefig(f'../model_data/plots/{model_name}_conf_matrix.png')
     # output some incorrect predictions
-    y_predictions_df = my_funcs.get_imgs_into_df(X_test, y, y_pred_bin)
-    wrong_imgs = y_predictions_df[y_predictions_df['predict'] != y_predictions_df['actual']]
-    num_samples = 10
-    figsize = (20,8)
-    fig, axs = my_funcs.plot_wrong_imgs(wrong_imgs, figsize, num_samples)
-    plt.savefig(f'../model_data/plots/{model_name}_incorrect_predictions_sample.png')
+    # y_predictions_df = my_funcs.get_imgs_into_df(X_test, y, y_pred_bin)
+    # wrong_imgs = y_predictions_df[y_predictions_df['predict'] != y_predictions_df['actual']]
+    # num_samples = 10
+    # figsize = (20,8)
+    # fig, axs = my_funcs.plot_wrong_imgs(wrong_imgs, figsize, num_samples)
+    # plt.savefig(f'../model_data/plots/{model_name}_incorrect_predictions_sample.png')
