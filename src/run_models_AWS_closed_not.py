@@ -117,10 +117,9 @@ if __name__ == "__main__":
     plt.savefig(f'../model_data/plots/{model_name}_ROC_curve.png')
     # confusion matrix
     confmat = my_funcs.compute_confusion_matrix(y, y_pred_bin)
-    x_labels = ['Predict: Established', 'Predict: Wild'] 
-    y_labels = ['Actual: Established', 'Actual: Wild']
+    labels = [f'pred: {x}' for x in class_names]
     fig, ax = plt.subplots(1, figsize = (8,6))
-    ax = my_funcs.plot_conf_matrix(confmat, ax, x_labels, y_labels, f'conf matrix for {model_name}')
+    ax = my_funcs.plot_conf_matrix(confmat, ax, labels, labels, f'conf matrix for {model_name}')
     plt.savefig(f'../model_data/plots/{model_name}_conf_matrix.png')
     # output some incorrect predictions
     y_predictions_df = my_funcs.get_imgs_into_df(X_test, y, y_pred_bin)
