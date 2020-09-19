@@ -16,7 +16,7 @@ from tensorflow.data.experimental import load
 from sklearn.metrics import classification_report, confusion_matrix, roc_curve, auc
 from tensorflow.keras import callbacks
 from tensorflow.keras.preprocessing import image_dataset_from_directory
-from keras import optimizers
+from tensorflow.keras import optimizers
 
 # load helper funcs
 import sys
