@@ -153,7 +153,7 @@ if __name__ == "__main__":
     # raw data:
     directory = '/home/ec2-user/data/all_US_unaugmented'
 
-    X_train, X_test, X_holdout = load_data_from_dir(directory, batch_size, img_size, test_data_size)
+    X_train, X_test, X_holdout = load_data_from_dir(directory, batch_size, img_size, img_size, test_data_size)
     # get class names for plotting and weights
     class_names, class_weights = get_class_weights(X_train)
     # set params
