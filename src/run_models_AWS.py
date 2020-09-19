@@ -83,9 +83,9 @@ def build_model(num_classes, nb_filters, kernel_size, pool_size, img_height, img
         return model
     
     model = Sequential([
-        layers.experimental.preprocessing.Rescaling(1./255, input_shape=input_shape),
+        layers.experimental.preprocessing.Rescaling(1./255, input_shape=img_height, img_width),
         layers.experimental.preprocessing.RandomFlip("horizontal", 
-                                                    input_shape=input_shape),
+                                                    input_shape=img_height, img_width),
         layers.experimental.preprocessing.RandomRotation(0.1),
         layers.experimental.preprocessing.RandomZoom(0.1),
         layers.Conv2D(nb_filters, (kernel_size[0], kernel_size[1]), padding='same', activation='relu'), # was 16, 32, 64
