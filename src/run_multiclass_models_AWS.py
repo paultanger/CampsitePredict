@@ -192,6 +192,7 @@ if __name__ == "__main__":
     directory = sys.argv[2]
     test_data_size = int(sys.argv[3])
     epochs = int(sys.argv[4])
+    batch_size = int(sys.argv[5])
     print(epochs)
     print(f'model name: {model_name} \n dir: {directory}')
     print(model_name)
@@ -206,7 +207,7 @@ if __name__ == "__main__":
     # directory = '/home/ec2-user/data/all_US_unaugmented'
 
     # 
-    batch_size = 32
+    # batch_size = 32
     img_size = 256
     img_height = 256
     img_width = 256
