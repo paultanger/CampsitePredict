@@ -111,7 +111,7 @@ def build_model(num_classes, nb_filters, kernel_size, pool_size, img_height, img
         layers.MaxPooling2D(pool_size=pool_size),
         layers.Flatten(),
         layers.Dense(final_dense, activation='relu'),
-        layers.Dropout(0.3),
+        #layers.Dropout(0.3),
         # layers.Dense(128, activation='softmax'),
         layers.Dense(num_classes, activation='softmax')
         # layers.Dense(1, activation='sigmoid')
