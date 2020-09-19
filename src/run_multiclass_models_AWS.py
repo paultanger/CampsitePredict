@@ -191,6 +191,7 @@ if __name__ == "__main__":
     model_name = sys.argv[1]
     directory = sys.argv[2]
     test_data_size = sys.argv[3]
+    epochs = sys.argv[4]
     print(f'model name: {model_name} \n dir: {directory}')
     print(model_name)
     print(keras.__version__)
@@ -218,7 +219,7 @@ if __name__ == "__main__":
     class_names, class_weights = get_class_weights(X_train)
     # set params
     num_classes = len(X_train.class_names)
-    epochs = 10 
+    # epochs = 10 
     AUTOTUNE = data.experimental.AUTOTUNE
     nb_filters = 32    
     pool_size = (2, 2)  
@@ -283,7 +284,7 @@ if __name__ == "__main__":
     # class_report_df.to_csv(f'../model_data/data/{model_name}_classification_report.csv')
     # ROC curve
     fig, ax = plt.subplots(1, figsize=(10, 8))
-    multiclass_funcs.multiclass_ROC_plot(class_names, y, predictions, ax, f'multi-class ROC for {model_name}')
+    multiclass_ROC_plot(class_names, y, predictions, ax, f'multi-class ROC for {model_name}')
     plt.savefig(f'../model_data/plots/{model_name}_ROC_curve.png')
     # confusion matrix
     confmat = confusion_matrix(y_true_class.argmax(axis=1), y_pred_class.argmax(axis=1), normalize='all')
