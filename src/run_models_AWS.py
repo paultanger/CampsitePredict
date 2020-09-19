@@ -36,7 +36,7 @@ def load_datasets(X_train_file, X_test_file):
     X_test = load(X_test_file, element_spec=X_test_elem_spec, compression='GZIP', reader_func=None)
     return X_train, X_test
 
-def load_data_from_dir(directory, batch_size, img_size):
+def load_data_from_dir(directory, batch_size, img_size, testsize):
     X_train = image_dataset_from_directory(
     directory, labels='inferred', class_names=None, 
     color_mode='rgb', batch_size=batch_size, image_size=(img_size, img_size), shuffle=True, seed=42,

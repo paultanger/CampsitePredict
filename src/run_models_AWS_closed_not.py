@@ -22,8 +22,8 @@ import sys
 import os
 sys.path.append(os.path.join(os.path.dirname(sys.path[0]), './'))
 import helper_funcs as my_funcs
-from run_multiclass_models_AWS import load_data_from_dir, prep_data, get_class_weights
-from run_multiclass_models_AWS import build_model
+from  run_multiclass_models_AWS import prep_data, get_class_weights
+from  run_models_AWS import load_data_from_dir, build_model
 
 
 if __name__ == "__main__":
