@@ -56,7 +56,7 @@ if __name__ == "__main__":
 
     # calc bias
     bias = np.array(list(class_weights.values())) 
-    output_bias = np.log(bias[0] / bias[1])
+    output_bias = np.array([np.log(bias[0] / bias[1])])
 
     X_train, X_test = prep_data(X_train, X_test, batch_size)
     model = build_model_imb(num_classes, nb_filters, kernel_size, pool_size, img_height, img_width, final_dense, output_bias)

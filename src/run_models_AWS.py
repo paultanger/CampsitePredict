@@ -113,7 +113,7 @@ def build_model_imb(num_classes, nb_filters, kernel_size, pool_size, img_height,
     if model_dir:
         model = keras.models.load_model(model_dir)
         return model
-    
+    output_bias = keras.initializers.Constant(output_bias)
     model = Sequential([
         layers.experimental.preprocessing.Rescaling(1./255, input_shape=(img_height, img_width, 3)),
         layers.experimental.preprocessing.RandomFlip("horizontal", 
