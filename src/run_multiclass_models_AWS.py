@@ -121,7 +121,7 @@ def build_model(num_classes, nb_filters, kernel_size, pool_size, img_height, img
         # layers.Dense(1, activation='sigmoid')
         ])
 
-    slow_adam = optimizers.Adam(learning_rate=0.0001)
+    slow_adam = optimizers.Adam(learning_rate=0.001)
 
     model.compile(optimizer=slow_adam, #'adam', # adadelta sgd
             #   loss=keras.losses.BinaryCrossentropy(from_logits=False),

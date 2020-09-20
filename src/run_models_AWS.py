@@ -43,7 +43,7 @@ def load_data_from_dir(directory, batch_size, img_size, testsize):
     validation_split=0.25, subset='training', interpolation='bilinear', follow_links=True
     )
     # batch size needs to be hard coded to split for holdout
-    testsize = 1968
+    # testsize = 1968
     X_test = image_dataset_from_directory(
     directory, labels='inferred', class_names=None, 
     color_mode='rgb', batch_size=testsize, image_size=(img_size, img_size), shuffle=True, seed=42, 
@@ -149,9 +149,6 @@ if __name__ == "__main__":
     test_data_size = int(sys.argv[3])
     epochs = int(sys.argv[4])
     batch_size = int(sys.argv[5])
-
-    # raw data:
-    directory = '/home/ec2-user/data/all_US_unaugmented'
 
     img_size = 256
     img_height = 256

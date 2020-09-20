@@ -337,13 +337,15 @@ def plot_train_val_acc(history, epochs, model_name, axs):
     return axs
 
 
-def run_kmeans(X, df, features, k):
+def run_kmeans(X, df, features, k, seed=None, provide_clusters=False):
     '''
     accepts a TFIDF object (X), original df, features, and k (int)
     runs k means, gets top 20 cluster features, calcs % most common in each
     returns these as two dictionaries
     '''
-    kmeans = KMeans(k)
+    if seed:
+        rand_seed = seed
+    kmeans = KMeans(k, random_state=rand_seed)
     kmeans.fit(X)
     top_centroids = kmeans.cluster_centers_.argsort()[:, -1:-21:-1]
     cluster_feats = {}
@@ -362,6 +364,8 @@ def run_kmeans(X, df, features, k):
         cluster_cats[i] = {}
         for j in range(len(most_common)):
             cluster_cats[i].update({most_common[j][0]: most_common[j][1]})
+    if provide_clusters:
+        return cluster_cats, cluster_feats, assigned_cluster
     return cluster_cats, cluster_feats
 
 
@@ -574,6 +578,98 @@ def get_class_weights(X_train):
     for i, weight in enumerate(weights):
         class_weights[i] = weight
     return class_names, class_weights
+
+def make_symlinks_file_lists(directory, destination, dest_dir_name, class_dirs, filenames_set):
+    counter = 0
+    filedict = {}
+    # make list of files with name and path in dict
+    for root_path, dirs, files in os.walk(directory, followlinks=False):
+        for file in files:
+            if file.endswith(".png"):
+                filedict[file] = str(os.path.join(root_path, file))
+    # create symlink dir
+    symlink_dir_path = os.path.join(destination + dest_dir_name)
+#     print(symlink_dir_path)
+    if not os.path.isdir(symlink_dir_path):
+            os.makedirs(symlink_dir_path)
+    # now go through files
+    for file, filepath in filedict.items():
+        # setup class directory name to check if it is a category we want to copy
+#         parent = os.path.basename(os.path.dirname(os.path.dirname(filepath)))
+#         print(parent)
+        subdir = os.path.basename(os.path.dirname(filepath))
+#         print(subdir)
+#         fullparent = os.path.join(sobel_dir + os.sep + parent + os.sep + subdir)
+        
+        # only copy files if in directories we want
+        if subdir in class_dirs:
+#             print(file)
+            if file in filenames_set:
+    #             print(subdir)
+                # create symlink
+    #             print(filepath)
+                destination_filepath = os.path.join(destination + dest_dir_name + os.sep + subdir + os.sep + file)
+    #             print(destination_filepath)
+                # create class dir if it doesn't exist
+                destination_class_dir = os.path.join(destination + dest_dir_name + os.sep + subdir + os.sep)
+    #             print(destination_class_dir)
+                if not os.path.isdir(destination_class_dir):
+                    os.makedirs(destination_class_dir)
+                # create destination filepath
+                os.symlink(filepath, destination_filepath, target_is_directory=False)
+                # ln -s ~/source/* wild_est_after_exc/Established\ Campground/
+                counter += 1
+    print(f'{counter} files were created as symlinks.')
+    return filedict
+
+def make_symlinks_file_lists_new_dirs(directory, destination, dest_dir_name, class_dirs, df):
+    counter = 0
+    filedict = {}
+    # make list of files with name and path in dict
+    for root_path, dirs, files in os.walk(directory, followlinks=False):
+        for file in files:
+            if file.endswith(".png"):
+                filedict[file] = str(os.path.join(root_path, file))
+    # create symlink dir
+    symlink_dir_path = os.path.join(destination + dest_dir_name)
+#     print(symlink_dir_path)
+    if not os.path.isdir(symlink_dir_path):
+            os.makedirs(symlink_dir_path)
+    # now go through files
+    # get filenames and labels to copy
+    filenames_dict = dict(zip(df['filename'], df['cluster_label']))
+    test_list = []
+    for file, filepath in filedict.items():
+        # setup class directory name to check if it is a category we want to copy
+#         parent = os.path.basename(os.path.dirname(os.path.dirname(filepath)))
+#         print(parent)
+        subdir = os.path.basename(os.path.dirname(filepath))
+#         print(subdir)
+#         fullparent = os.path.join(sobel_dir + os.sep + parent + os.sep + subdir)
+        
+        # only copy files if in directories we want
+        if subdir in class_dirs:
+#             print(type(file))
+            
+            if file in filenames_dict:
+                test_list.append(file)
+    #             print(subdir)
+                # create symlink
+#                 print(filepath)
+                # use the filename / label dictionary to determine what the new directory will be called
+                destination_filepath = os.path.join(destination + dest_dir_name + os.sep + filenames_dict[file] + os.sep + file)
+#                 print(destination_filepath)
+                # create class dir if it doesn't exist
+                destination_class_dir = os.path.join(destination + dest_dir_name + os.sep + filenames_dict[file] + os.sep)
+    #             print(destination_class_dir)
+                if not os.path.isdir(destination_class_dir):
+                    os.makedirs(destination_class_dir)
+                # create destination filepath
+                os.symlink(filepath, destination_filepath, target_is_directory=False)
+                # ln -s ~/source/* wild_est_after_exc/Established\ Campground/
+                counter += 1
+    print(f'{counter} files were created as symlinks.')
+    return test_list
     
 if __name__ == "__main__":
     pass

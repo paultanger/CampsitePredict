@@ -35,8 +35,6 @@ if __name__ == "__main__":
     epochs = int(sys.argv[4])
     batch_size = int(sys.argv[5])
 
-    # raw data:
-    directory = '/home/ec2-user/data/wild_closed_not'
 
     img_size = 256
     img_height = 256
