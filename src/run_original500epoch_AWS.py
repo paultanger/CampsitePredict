@@ -113,6 +113,9 @@ if __name__ == "__main__":
     # get predictions together with image filename and original df with other data
     y_predictions_df = my_funcs.get_imgs_into_df(X_test, y, y_pred_bin)
     # y_predictions_df.to_csv('../data/test.csv')
+    # add correct col
+    y_predictions_df['correct'] = 0
+    y_predictions_df['correct'][y_predictions_df['predict'] == y_predictions_df['actual']] = 1
     # add the filenames
     y_predictions_df['filepaths'] = X_test_img_paths
     y_predictions_df['filename'] = pd.Series(y_predictions_df['filepaths'].str.rsplit('/', n=1, expand=True)[1])
@@ -124,13 +127,16 @@ if __name__ == "__main__":
     # merge
     df_with_preds = y_predictions_df.merge(original_df, how='left', on = 'filename')
     # save it
-    df_with_preds.to_csv('../data/df_with_preds2.tsv', sep='\t')
+    df_with_preds.to_csv('../data/df_with_preds3.tsv', sep='\t')
     # drop the actual image arrays and merge
     y_predictions_df_no_imgs = y_predictions_df.drop('image', axis=1)
     df_with_preds_no_imgs = y_predictions_df_no_imgs.merge(original_df, how='left', on = 'filename')
     # save it
-    df_with_preds_no_imgs.to_csv('../data/df_with_preds_no_imgs2.tsv', sep='\t')
+    df_with_preds_no_imgs.to_csv('../data/df_with_preds_no_imgs3.tsv', sep='\t')
 
+    test = df_with_preds.iloc[0,2]
+    plt.imshow(test) 
+    plt.show()
     # # save example images
     # num_samples = 10
     # figsize = (15,8)
