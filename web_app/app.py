@@ -8,7 +8,7 @@ import googlemaps
 import json
 import boto3
 import matplotlib.pyplot as plt
-
+from skimage.transform import resize
 # from flask_sqlalchemy import SQLAlchemy
 # db = SQLAlchemy(app)
 
@@ -18,6 +18,10 @@ def setup_db(db_details):
 # setup db for queries
 # db_details = f'postgresql://postgres:{getpass()}@3.20.229.59:5432/campsite'
 # engine = setup_db(db_details)
+
+# load model and related
+from tensorflow import keras
+model = keras.models.load_model('static/data/500_epochs_model_wild_est_binary')
 
 # setup access to google API through AWS parameter store
 ssm = boto3.client('ssm', 'us-east-2')
@@ -194,11 +198,18 @@ def predict_results():
         gps_coords = request.form['gps_coords']
         # return(str(gps_coords))
         cropped, cur_filename = get_image_from_gps(gmaps, gps_coords)
-
+        # prep for model
+        cropped = resize(cropped, (256, 256))
+        # drop alpha
+        cropped = cropped[:,:,:3]
+        test_img = np.expand_dims(cropped, axis=0) 
         # make model prediction
-
-        predict_text = 'model prediction to be added'
-        actual_text = 'model prediction to be added'
+        predictions = model.predict(test_img)
+        y_pred_bin = (predictions > 0.5).astype("int32")
+        if y_pred_bin:
+            predict_text = 'Established Campground'
+        else:
+            predict_text = 'Wild Camping'
 
     except:
         return f"""You have entered an incorrect value or something isn't quite working right.
@@ -207,8 +218,7 @@ def predict_results():
     return render_template('predict_results.html', 
                             gps_coords=gps_coords,
                             filename=cur_filename,
-                            predict_text=predict_text,
-                            actual_text=actual_text)
+                            predict_text=predict_text)
 
 
 if __name__ == '__main__':
