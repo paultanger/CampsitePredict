@@ -167,6 +167,44 @@ def download_images(client, df, zoomlevel, n_requests, max_requests=10, prefix="
             time.sleep(2)
     return True
 
+def get_image_from_gps(client, latlong, zoomlevel=17, out_path="temp_images/"):
+    '''
+    downloads satellite images using a google API from GPS coords
+    This requires matplotlib.pyplot as plt, pandas as pd and os.
+    Returns True when it is done.
+    '''
+        # temp save coords
+        lat = str(latlong[0])
+        longi = str(latlong[1])
+
+        # create filename
+        cur_filename = f'satimg_{zoomlevel}_{lat}_{longi}.png'
+        print(cur_filename)
+
+        # get the image
+        satimg = client.static_map(
+            size = (400, 400),  # pixels
+            zoom = zoomlevel,  # 1-21
+            center = (lat, longi),
+            scale = 1,  # default is 1, 2 returns 2x pixels for high res displays
+            maptype = "satellite",
+            format = "png"
+            )
+
+        # save the current image
+        f = open(out_path + cur_filename, 'wb')
+        for chunk in satimg:
+            if chunk:
+                f.write(chunk)
+        f.close()
+        # open it to crop the text off
+        img = plt.imread(out_path + cur_filename)
+        # maybe crop all 4 sides?
+        cropped = img[25:375, 25:375]
+        # and resave
+        plt.imsave(out_path + cur_filename, cropped)
+    return cropped, cur_filename
+
 
 def run_model(model, X_test):
     '''

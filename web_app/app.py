@@ -4,6 +4,10 @@ import pandas as pd
 from sqlalchemy import create_engine
 from getpass import getpass
 import sys, os
+import googlemaps
+import json
+import boto3
+import matplotlib.pyplot as plt
 
 # from flask_sqlalchemy import SQLAlchemy
 # db = SQLAlchemy(app)
@@ -14,6 +18,58 @@ def setup_db(db_details):
 # setup db for queries
 # db_details = f'postgresql://postgres:{getpass()}@3.20.229.59:5432/campsite'
 # engine = setup_db(db_details)
+
+# setup access to google API through AWS parameter store
+ssm = boto3.client('ssm', 'us-east-2')
+def get_API():
+    response = ssm.get_parameters(
+        Names=['googleAPIkey'],WithDecryption=True)
+    for parameter in response['Parameters']:
+        return parameter['Value']
+googleAPIkey = get_API()
+gmaps = googlemaps.Client(googleAPIkey)
+
+def get_image_from_gps(client, latlong, zoomlevel=17, out_path="static/temp_images/"):
+    '''
+    downloads satellite images using a google API from GPS coords
+    This requires matplotlib.pyplot as plt, pandas as pd and os.
+    Returns True when it is done.
+    '''
+    # temp save coords
+    latlong = latlong.split(',')
+    lat = str(latlong[0]).strip()
+    longi = str(latlong[1]).strip()
+
+    # create filename
+    cur_filename = f'satimg_{zoomlevel}_{lat}_{longi}.png'
+    # remove dashes from filenames, hacky I know
+    # cur_filename = cur_filename.replace('-', '') 
+    # print(cur_filename)
+
+    # get the image
+    satimg = client.static_map(
+        size = (400, 400),  # pixels
+        zoom = zoomlevel,  # 1-21
+        center = (lat, longi),
+        scale = 1,  # default is 1, 2 returns 2x pixels for high res displays
+        maptype = "satellite",
+        format = "png"
+        )
+
+    # save the current image
+    f = open(out_path + cur_filename, 'wb')
+    for chunk in satimg:
+        if chunk:
+            f.write(chunk)
+    f.close()
+    # open it to crop the text off
+    img = plt.imread(out_path + cur_filename)
+    # maybe crop all 4 sides?
+    cropped = img[25:375, 25:375]
+    # and resave
+    plt.imsave(out_path + cur_filename, cropped)
+    return cropped, cur_filename
+
 
 data = pd.read_csv('static/data/df_with_preds_no_imgs3.tsv', sep='\t')
 # select cols to keep for display
@@ -100,8 +156,16 @@ def results():
         # return str(img_paths)
 
         # create pretty output for predictions and don't show those cols
-        predict_text = result['predict'].values[0]
-        actual_text = result['actual'].values[0]
+        # predict_text = result['predict'].values[0]
+        if result['predict'].values[0] == 'est_camp':
+            predict_text = 'Established Campground'
+        else:
+            predict_text = 'Wild Camping'
+        if result['actual'].values[0] == 'est_camp':
+            actual_text = 'Established Campground'
+        else:
+            actual_text = 'Wild Camping'
+        # actual_text = result['actual'].values[0]
         result.drop(['predict', 'actual', 'correct', 'filename'], axis=1, inplace=True)
 
         # query = f"SELECT body_length, channels, country, currency, delivery_method, description, email_domain, \
@@ -119,10 +183,39 @@ def results():
                             img_paths=img_paths,
                             data=result.to_html(index=False))
 
+@app.route('/predict', methods=['GET', 'POST'])
+def predict_query():
+    # form action is what to do when submitted
+    return render_template("predict_query.html")
+
+@app.route('/predict_results', methods=['GET', 'POST'])
+def predict_results():
+    try:
+        gps_coords = request.form['gps_coords']
+        # return(str(gps_coords))
+        cropped, cur_filename = get_image_from_gps(gmaps, gps_coords)
+
+        # make model prediction
+
+        predict_text = 'model prediction to be added'
+        actual_text = 'model prediction to be added'
+
+    except:
+        return f"""You have entered an incorrect value or something isn't quite working right.
+                    Sorry about that!  Hit the back button and try again."""
+    #TODO: figure out how to delete images later
+    return render_template('predict_results.html', 
+                            gps_coords=gps_coords,
+                            filename=cur_filename,
+                            predict_text=predict_text,
+                            actual_text=actual_text)
+
+
 if __name__ == '__main__':
     # db_details = f'postgresql://postgres:{getpass()}@3.20.229.59:5432/campsite'
     # engine = setup_db(db_details)
     # run appç
+    # googleAPIkey = get_API()
     if len(sys.argv) > 1:
         MEDIA_FOLDER = '/home/ec2-user/github/media/images/'
         app.run(host='0.0.0.0', port=33507, debug=False)

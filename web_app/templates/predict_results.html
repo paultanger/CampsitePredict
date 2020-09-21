@@ -1,0 +1,15 @@
+{% extends "layout.html" %}
+{% block content %}
+        <h1 class="mt-4">Results</h1>
+        
+        <p>The model predicted this site:   <b>{{predict_text}}</b>
+        <br>
+        and the actual category label was:  <b>{{actual_text}}</b></p>
+
+        <p></p>
+        <!-- {{filename}} -->
+        <img src=static/temp_images/{{filename}}>
+        <!-- <img src="{{ url_for('get_file', filename=filename) }}"> -->
+        <p>GPS coordinates of this site:</p>
+        {{gps_coords}}
+        {% endblock %}
