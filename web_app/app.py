@@ -14,7 +14,7 @@ def setup_db(db_details):
 # db_details = f'postgresql://postgres:{getpass()}@3.20.229.59:5432/campsite'
 # engine = setup_db(db_details)
 
-data = pd.read_csv('../data/df_with_preds_no_imgs3.tsv', sep='\t')
+data = pd.read_csv('../static/data/df_with_preds_no_imgs3.tsv', sep='\t')
 # select cols to keep for display
 data_display = data[['predict', 'actual', 'correct', 'filename', 'Name', 'Category', 'Description', 'State']]
 
@@ -78,7 +78,7 @@ def results():
 
         # get the image to display
         img_list = [filename for filename in result['filename']]
-        
+
         # query = f"SELECT body_length, channels, country, currency, delivery_method, description, email_domain, \
         #         fb_published, has_analytics, name, org_name, \
         #         sale_duration, user_age, venue_country, venue_name, created_at \
