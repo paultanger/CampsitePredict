@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template, send_from_directory
 import numpy as np
 import pandas as pd
 from sqlalchemy import create_engine
@@ -22,7 +22,18 @@ data_display = data[['predict', 'actual', 'correct', 'filename', 'Name', 'Catego
 # setup image path
 img_path = '../../../media/'
 
-app = Flask(__name__, root_path='./') # template_folder = 'templates/')
+# app = Flask(__name__)
+app = Flask(__name__, root_path='./')# template_folder = 'templates/')
+# app = Flask(__name__, root_path='./', static_url_path='/Users/pault/Desktop/github/media/', 
+# app = Flask(__name__, root_path='./', static_url_path='/Users/pault/Desktop/github/media/') 
+
+
+# MEDIA_FOLDER = '../../../media/images/'
+MEDIA_FOLDER = '/Users/pault/Desktop/github/media/images/'
+# MEDIA_FOLDER = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), 'data')
+@app.route('/images/<path:filename>')
+def get_file(filename):
+    return send_from_directory(MEDIA_FOLDER, filename, as_attachment=True)
 
 @app.route('/', methods=['GET'])
 def home():
@@ -85,6 +96,8 @@ def results():
         
         # get the image to display
         img_paths = [os.path.join(img_path, filename) for filename in result['filename']]
+        img_paths = [filename for filename in result['filename']]
+        # return str(img_paths)
 
         # create pretty output for predictions and don't show those cols
         predict_text = result['predict'].values[0]
@@ -111,6 +124,7 @@ if __name__ == '__main__':
     # engine = setup_db(db_details)
     # run appç
     if len(sys.argv) > 1:
+        MEDIA_FOLDER = '/home/ec2-user/github/media/images/'
         app.run(host='0.0.0.0', port=33507, debug=False)
     else:
         app.run(host='0.0.0.0', port=8080, debug=True)

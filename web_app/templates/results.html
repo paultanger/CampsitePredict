@@ -75,13 +75,19 @@
         <p>The model predicted this site:   <b>{{predict_text}}</b>
         <br>
         and the actual category label was:  <b>{{actual_text}}</b></p>
-        <br>
-        <img src='./test.png'>
+        <!-- <img src='static/images/test.png'> -->
+        <!-- <img src="{{ url_for('static', filename='images/test.png') }}"> -->
+        <!-- <img src='./test.png'> -->
+        <!-- <img src="{{ url_for('get_file', filename='test.png') }}"> -->
         {% for image in img_paths %}
-          {{image}}
-          <img src=../../media/satimg_AK_10199_Wild%20Camping_17_62.724088_-141.181026.png>
-          <img src={{image}} alt="satellite image of site">
+          <!-- {{image}} -->
+          <!-- <img src="{{ url_for('get_file', filename='test.png') }}"> -->
+          <img src="{{ url_for('get_file', filename=image) }}">
+          <!-- <img src='./test.png'> -->
+          <!-- <img src='../../media/images/satimg_AK_10199_Wild%20Camping_17_62.724088_-141.181026.png'> -->
+          <!-- <img src={{image}} alt="satellite image of site"> -->
         {% endfor %}
+        <p></p>
         <p>details of this site:</p>
         {{data | safe}}
       </div>
