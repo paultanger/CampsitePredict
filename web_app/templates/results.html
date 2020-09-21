@@ -70,9 +70,19 @@
       </nav>
 
       <div class="container-fluid">
-        <h1 class="mt-4">Project Overview</h1>
-        <!-- <img class="card-img-top img-fluid" src={{image}} alt=""> -->
-        <p>details of this site</p>
+        <h1 class="mt-4">Results</h1>
+        
+        <p>The model predicted this site:   <b>{{predict_text}}</b>
+        <br>
+        and the actual category label was:  <b>{{actual_text}}</b></p>
+        <br>
+        <img src='./test.png'>
+        {% for image in img_paths %}
+          {{image}}
+          <img src=../../media/satimg_AK_10199_Wild%20Camping_17_62.724088_-141.181026.png>
+          <img src={{image}} alt="satellite image of site">
+        {% endfor %}
+        <p>details of this site:</p>
         {{data | safe}}
       </div>
     </div>

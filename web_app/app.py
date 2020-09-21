@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 from sqlalchemy import create_engine
 from getpass import getpass
+import sys, os
 
 # from flask_sqlalchemy import SQLAlchemy
 # db = SQLAlchemy(app)
@@ -18,6 +19,8 @@ data = pd.read_csv('static/data/df_with_preds_no_imgs3.tsv', sep='\t')
 # select cols to keep for display
 data_display = data[['predict', 'actual', 'correct', 'filename', 'Name', 'Category', 'Description', 'State']]
 
+# setup image path
+img_path = '../../../media/'
 
 app = Flask(__name__, root_path='./') # template_folder = 'templates/')
 
@@ -63,21 +66,30 @@ def query():
     #             <input type="submit" />
     #            </form>
     #          '''
+@app.route('/test', methods=['GET', 'POST'])
+def test():
+    return render_template("test.html")
 
 @app.route('/results', methods=['GET', 'POST'])
 def results():
     try:
         n_sample = int(request.form['n_sample'])
-        predict_type = int(request.form['predict_type'])
-        print(predict_type)
-        if predict_type == 1:
+        predict_type = request.form['predict_type']
+        # return(str(predict_type))
+        if predict_type == 'Correct Predictions':
             result = data_display[data_display['correct'] == 1]
         else:
             result = data_display[data_display['correct'] == 0]
         result = result.sample(n_sample)
 
+        
         # get the image to display
-        img_list = [filename for filename in result['filename']]
+        img_paths = [os.path.join(img_path, filename) for filename in result['filename']]
+
+        # create pretty output for predictions and don't show those cols
+        predict_text = result['predict'].values[0]
+        actual_text = result['actual'].values[0]
+        result.drop(['predict', 'actual', 'correct', 'filename'], axis=1, inplace=True)
 
         # query = f"SELECT body_length, channels, country, currency, delivery_method, description, email_domain, \
         #         fb_published, has_analytics, name, org_name, \
@@ -85,15 +97,22 @@ def results():
         #         FROM api_data WHERE created_at IS NOT NULL ORDER BY created_at DESC LIMIT {n_records};"
         # rows = pd.read_sql(query, con=engine)
     except:
-        return f"""something is broken"""
+        return f"""You have entered an incorrect value or something isn't quite working right.
+                    Sorry about that!  Hit the back button and try again."""
 
-    return render_template('results.html', data=result.to_html(index=False))
+    return render_template('results.html', 
+                            predict_text=predict_text, 
+                            actual_text=actual_text, 
+                            img_paths=img_paths,
+                            data=result.to_html(index=False))
 
 if __name__ == '__main__':
-    # setup api save to db
     # db_details = f'postgresql://postgres:{getpass()}@3.20.229.59:5432/campsite'
     # engine = setup_db(db_details)
-    # run app
-    app.run(host='0.0.0.0', port=8080, debug=True)
+    # run appç
+    if len(sys.argv) > 1:
+        app.run(host='0.0.0.0', port=33507, debug=False)
+    else:
+        app.run(host='0.0.0.0', port=8080, debug=True)
     # for AWS
     # app.run(host='0.0.0.0', port=33507, debug=False)

@@ -72,13 +72,20 @@
       <div class="container-fluid">
         <h1 class="mt-4">Review Dashboard selection</h1>
         <p>explain how this works.</p>
-        <p>choose if you want to view correct or incorrect predictions</p> 
+        <p>choose if you want to view correct or incorrect predictions:</p> 
         <form action="/results" method="POST">
-          <input type="text" name="predict_type" />
+          <!-- <input type="text" name="predict_type" /> -->
+          <select name="predict_type">
+            <option value="Correct Predictions">Correct Predictions</option>
+            <option value="Incorrect Predictions">Incorrect Predictions</option>
+            </select>
           <!-- <input type="submit" /> -->
-          <p>number of samples to view</p> 
-          <input type="text" name="n_sample" />
-          <input type="submit" />
+          <p></p>
+          <p>enter number of samples to view:</p> 
+          <input type="number" name="n_sample" min="1" max="1"/>
+          <p></p>
+          <p>once you have selected the options, click below:</p>
+          <input type="submit" value="view results"/>
         </form>
       </div>
     </div>
