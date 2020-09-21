@@ -13,7 +13,7 @@ from tensorflow.python.util.tf_export import keras_export
 
 
 WHITELIST_FORMATS = ('.bmp', '.gif', '.jpeg', '.jpg', '.png')
-    
+
 
 # @keras_export('keras.preprocessing.image_dataset_from_directory', v1=[])
 def image_dataset_from_directory_paths(directory,
@@ -176,6 +176,11 @@ def image_dataset_from_directory_paths(directory,
   if shuffle:
     # Shuffle locally at each iteration
     dataset = dataset.shuffle(buffer_size=batch_size * 8, seed=seed)
+    ### paul added
+    # also shuffle image paths in same order
+    # dataset.shuffle  # ShuffleDataset(self, buffer_size, seed, reshuffle_each_iteration)
+    # random_seed.get_seed(seed)
+    # gen_dataset_ops.shuffle_dataset_v3(
   dataset = dataset.batch(batch_size)
   # Users may need to reference `class_names`.
   dataset.class_names = class_names
