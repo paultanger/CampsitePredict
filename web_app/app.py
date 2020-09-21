@@ -9,6 +9,7 @@ import json
 import boto3
 import matplotlib.pyplot as plt
 from skimage.transform import resize
+from PIL import Image
 # from flask_sqlalchemy import SQLAlchemy
 # db = SQLAlchemy(app)
 
@@ -72,7 +73,8 @@ def get_image_from_gps(client, latlong, zoomlevel=17, out_path="static/temp_imag
     cropped = img[25:375, 25:375]
     # and resave
     plt.imsave(out_path + cur_filename, cropped)
-    return cropped, cur_filename
+    PILimg = Image.open(out_path + cur_filename)
+    return cropped, cur_filename, PILimg
 
 
 data = pd.read_csv('static/data/df_with_preds_no_imgs3.tsv', sep='\t')
@@ -197,19 +199,27 @@ def predict_results():
     try:
         gps_coords = request.form['gps_coords']
         # return(str(gps_coords))
-        cropped, cur_filename = get_image_from_gps(gmaps, gps_coords)
+        cropped, cur_filename, PILimg = get_image_from_gps(gmaps, gps_coords)
         # prep for model
-        cropped = resize(cropped, (256, 256))
+        # cropped = resize(cropped, (256, 256))
         # drop alpha
-        cropped = cropped[:,:,:3]
-        test_img = np.expand_dims(cropped, axis=0) 
+        # cropped = cropped[:,:,:3]
+        # test_img = np.expand_dims(cropped, axis=0) 
+        # for some reason this doesn't work.. try with PIL
+        # im = Image.fromarray(np.uint8(cropped))
+        # im = Image.open(path)
+        im = PILimg.resize((256, 256), resample=Image.BILINEAR) 
+        input_arr = keras.preprocessing.image.img_to_array(im)
+        input_arr_rgb = input_arr[:,:,:3]
+        input_arr_rgb = np.array([input_arr_rgb])
+        # model.predict(input_arr_rgb)
         # make model prediction
-        predictions = model.predict(test_img)
+        predictions = model.predict(input_arr_rgb)
         y_pred_bin = (predictions > 0.5).astype("int32")
-        if y_pred_bin:
-            predict_text = 'Established Campground'
+        if y_pred_bin == 1:
+            predict_text = 'Wild Camping' 
         else:
-            predict_text = 'Wild Camping'
+            predict_text = 'Established Campground'
 
     except:
         return f"""You have entered an incorrect value or something isn't quite working right.
@@ -218,6 +228,7 @@ def predict_results():
     return render_template('predict_results.html', 
                             gps_coords=gps_coords,
                             filename=cur_filename,
+                            output = predictions,
                             predict_text=predict_text)
 
 

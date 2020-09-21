@@ -76,7 +76,7 @@ def prep_data(X_test, batch_size=None):
         X_test = X_test.batch(batch_size)
     # X_train = X_train.cache().shuffle(32, seed=42).prefetch(buffer_size=AUTOTUNE) 
     X_test = X_test.cache().prefetch(buffer_size=AUTOTUNE)
-    return X_train, X_test
+    return X_test
 
 
 if __name__ == "__main__":
@@ -107,36 +107,81 @@ if __name__ == "__main__":
     # check
     print(model.summary())
 
-    # run model
+    # # run model
     y, predictions, y_pred, y_pred_bin, fpr_keras, tpr_keras, thresholds_keras, auc_keras = my_funcs.run_model(model, X_test)
 
-    # get predictions together with image filename and original df with other data
-    y_predictions_df = my_funcs.get_imgs_into_df(X_test, y, y_pred_bin)
-    # y_predictions_df.to_csv('../data/test.csv')
-    # add correct col
-    y_predictions_df['correct'] = 0
-    y_predictions_df['correct'][y_predictions_df['predict'] == y_predictions_df['actual']] = 1
-    # add the filenames
-    y_predictions_df['filepaths'] = X_test_img_paths
-    y_predictions_df['filename'] = pd.Series(y_predictions_df['filepaths'].str.rsplit('/', n=1, expand=True)[1])
-    # merge with original df
-    original_df = pd.read_csv('../data/image_file_df_final_with_df_NO_DUPS.csv')
-    original_df.drop('Unnamed: 0', axis=1, inplace=True)
-    # add png so they will match
-    original_df['filename'] = original_df['filename'] + '.png'
-    # merge
-    df_with_preds = y_predictions_df.merge(original_df, how='left', on = 'filename')
-    # save it
-    df_with_preds.to_csv('../data/df_with_preds3.tsv', sep='\t')
-    # drop the actual image arrays and merge
-    y_predictions_df_no_imgs = y_predictions_df.drop('image', axis=1)
-    df_with_preds_no_imgs = y_predictions_df_no_imgs.merge(original_df, how='left', on = 'filename')
-    # save it
-    df_with_preds_no_imgs.to_csv('../data/df_with_preds_no_imgs3.tsv', sep='\t')
 
-    test = df_with_preds.iloc[0,2]
-    plt.imshow(test) 
+    # test image - should be predicting correctly as wild (1)..
+    path = '../../media/images/satimg_AK_10199_Wild Camping_17_62.724088_-141.181026.png'
+    path = '../../media/images/satimg_AK_1028_Established Campground_17_60.958322_-149.111734.png'
+    path = '../web_app/static/temp_images/satimg_17_38.497862_-106.945057.png'
+    # this should be wild:
+    path = '../web_app/static/temp_images/satimg_17_62.724088_-141.181026.png'
+    cropped = plt.imread(path)
+    plt.imshow(cropped)
     plt.show()
+    # prep for model
+    from skimage.transform import resize
+    cropped = cropped[:,:,:3]
+    cropped = resize(cropped, (256, 256))
+    # drop alpha
+    # cropped = cropped[:,:,:3]
+    test_img = np.expand_dims(cropped, axis=0) 
+    # make model prediction
+    predictions = model.predict(test_img)
+    y_pred_bin = (predictions > 0.5).astype("int32")
+    if y_pred_bin == 1:
+        predict_text = 'Wild Camping' 
+    else:
+        predict_text = 'Established Campground'
+    path = '/Users/pault/Desktop/github/CampsitePredict/web_app/static/temp_images/test'
+    from tensorflow.keras.preprocessing.image import load_img, img_to_array
+    path = '../web_app/static/temp_images/satimg_17_62.724088_-141.181026.png'
+    cropped = plt.imread(path)
+    plt.imshow(cropped)
+    plt.show()
+    testimg2 = load_img(path, grayscale=False, color_mode="rgb", target_size=(256,256), interpolation="bilinear")
+    input_arr = keras.preprocessing.image.img_to_array(testimg2)
+    input_arr = np.array([input_arr]) 
+    model.predict(input_arr)
+    # will pil also work?
+    from PIL import Image
+    im = Image.open(path)
+    im = im.resize((256, 256), resample=Image.BILINEAR) 
+    input_arr = keras.preprocessing.image.img_to_array(im)
+    input_arr_rgb = input_arr[:,:,:3]
+    input_arr_rgb = np.array([input_arr_rgb])
+    model.predict(input_arr_rgb)
+    X_test, X_test_img_paths = load_data_from_dir_all_for_predictions(path, 32, 256, 32, shuffle_test=False)
+
+
+    # # get predictions together with image filename and original df with other data
+    # y_predictions_df = my_funcs.get_imgs_into_df(X_test, y, y_pred_bin)
+    # # y_predictions_df.to_csv('../data/test.csv')
+    # # add correct col
+    # y_predictions_df['correct'] = 0
+    # y_predictions_df['correct'][y_predictions_df['predict'] == y_predictions_df['actual']] = 1
+    # # add the filenames
+    # y_predictions_df['filepaths'] = X_test_img_paths
+    # y_predictions_df['filename'] = pd.Series(y_predictions_df['filepaths'].str.rsplit('/', n=1, expand=True)[1])
+    # # merge with original df
+    # original_df = pd.read_csv('../data/image_file_df_final_with_df_NO_DUPS.csv')
+    # original_df.drop('Unnamed: 0', axis=1, inplace=True)
+    # # add png so they will match
+    # original_df['filename'] = original_df['filename'] + '.png'
+    # # merge
+    # df_with_preds = y_predictions_df.merge(original_df, how='left', on = 'filename')
+    # # save it
+    # df_with_preds.to_csv('../data/df_with_preds3.tsv', sep='\t')
+    # # drop the actual image arrays and merge
+    # y_predictions_df_no_imgs = y_predictions_df.drop('image', axis=1)
+    # df_with_preds_no_imgs = y_predictions_df_no_imgs.merge(original_df, how='left', on = 'filename')
+    # # save it
+    # df_with_preds_no_imgs.to_csv('../data/df_with_preds_no_imgs3.tsv', sep='\t')
+
+    # test = df_with_preds.iloc[0,2]
+    # plt.imshow(test) 
+    # plt.show()
     # # save example images
     # num_samples = 10
     # figsize = (15,8)
