@@ -105,13 +105,13 @@ def home():
 @app.route('/analysis') 
 def analysis():
     sample = data_display.sample(10)
-    return render_template("analysis.html", tables=[sample.to_html(classes='data', index=False)], titles=sample.columns.values)
+    return render_template("analysis.html", tables=[sample.to_html(classes=["table", "text-right", "table-hover"], border=0, index=False)], titles=sample.columns.values)
 
 # display sample with template
 @app.route('/sample') 
 def sample():
     sample = data_display.sample(10)
-    return render_template("sample.html", table=sample.to_html(classes='data', index=False))
+    return render_template("sample.html", table=sample.to_html(classes=["table","text-right", "table-hover"], border=0, index=False)) # table-hover table-sm
 
 # display most recent 10 from api
 # @app.route('/recent10')
@@ -187,7 +187,7 @@ def results():
                             predict_text=predict_text, 
                             actual_text=actual_text, 
                             img_paths=img_paths,
-                            data=result.to_html(index=False))
+                            data=result.to_html(index=False, classes=["table", "text-right", "table-hover"], border=0))
 
 @app.route('/predict', methods=['GET', 'POST'])
 def predict_query():
