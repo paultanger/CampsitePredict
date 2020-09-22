@@ -203,13 +203,7 @@ if __name__ == "__main__":
     print(epochs)
     print(f'model name: {model_name} \n dir: {directory}')
     print(model_name)
-    print(keras.__version__)
     print(tensorflow.__version__)
-    # os.system('nvidia-smi')
-
-    # path to files:
-    X_train_data_path = '/home/ec2-user/data/all_US_data/X_train_256px_32batch'
-    X_test_data_path = '/home/ec2-user/data/all_US_data/X_test_256px_unbatched'
     # raw data:
     # directory = '/home/ec2-user/data/all_US_unaugmented'
 
@@ -245,23 +239,6 @@ if __name__ == "__main__":
     # check
     print(model.summary())
 
-    my_callbacks = [
-    callbacks.EarlyStopping(patience=25),
-    #     callbacks.ModelCheckpoint(
-    #                         filepath='../data/tensorboard_models/model.{epoch:02d}-{val_loss:.2f}.h5', 
-    #                         monitor='val_loss', 
-    #                         verbose=0, 
-    #                         save_best_only=False,
-    #                         save_weights_only=False, 
-    #                         mode='auto', 
-    #                         save_freq='epoch', 
-    #                         options=None),
-        callbacks.TensorBoard(log_dir='../tensorboard_logs',
-                            histogram_freq=2,
-                            write_graph=True,
-                            write_images=True),
-    ]
-
     # fit model
     history = model.fit(
             X_train,
@@ -269,12 +246,7 @@ if __name__ == "__main__":
             epochs = epochs,
             class_weight = class_weights,
             verbose = 2,
-#            callbacks=my_callbacks
 )
-
-    # name model
-    # model_name = '200_epochs_all_US_model_wild_est_binary'
-    # model_name = 'test_all_US_model_wild_est_binary'
 
     # save model
     model.save(f'../model_data/models/{model_name}')
@@ -307,10 +279,3 @@ if __name__ == "__main__":
     fig, ax = plt.subplots(1, figsize = (8,6))
     ax = my_funcs.plot_conf_matrix(confmat, ax, xlabels, ylabels, f'conf matrix for {model_name}')
     plt.savefig(f'../model_data/plots/{model_name}_conf_matrix.png')
-    # output some incorrect predictions
-    # y_predictions_df = my_funcs.get_imgs_into_df(X_test, y, y_pred_bin)
-    # wrong_imgs = y_predictions_df[y_predictions_df['predict'] != y_predictions_df['actual']]
-    # num_samples = 10
-    # figsize = (20,8)
-    # fig, axs = my_funcs.plot_wrong_imgs(wrong_imgs, figsize, num_samples)
-    # plt.savefig(f'../model_data/plots/{model_name}_incorrect_predictions_sample.png')
