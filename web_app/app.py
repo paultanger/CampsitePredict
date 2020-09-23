@@ -105,6 +105,10 @@ def home():
 def about():
     return render_template("about.html")
 
+@app.route('/final_slide', methods=['GET'])
+def final_slide():
+    return render_template("final_slide.html")
+
 # display sample from df for testing
 @app.route('/analysis') 
 def analysis():
